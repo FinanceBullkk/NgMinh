@@ -7,8 +7,10 @@
 
 ## Overview
 - **Priority:** P1 (data foundation)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Create all tables, enum, indexes, RLS policies, and a per-user default-sentiment seed via `handle_new_user` trigger. Version-controlled via Supabase CLI migrations.
+- **Setup:** Local-first Supabase (CLI 2.107.0 + Docker Desktop). `supabase start` stack running; `.env.local` wired with local API URL + publishable key.
+- **Deviation (added during smoke test):** RLS alone gave `42501 permission denied` via PostgREST — tables also need role GRANTs. Added `GRANT SELECT/INSERT/UPDATE/DELETE ... TO authenticated` (anon intentionally left with none) to migration 004. 6 migrations total (no separate grants file).
 
 ## Key Insights
 - **Spec mandates UUID PKs** (`uuid id PK`). Use `uuid DEFAULT gen_random_uuid()` everywhere — NOT bigint (research-03 sample used bigint; spec overrides).
@@ -77,16 +79,16 @@
 10. Write `docs/data-model.md` documenting tables, enums, RLS, archive rule.
 
 ## Todo List
-- [ ] `supabase init` + local start
-- [ ] Enums migration (entry_type, goal_status)
-- [ ] Tables migration (UUID PKs, denormalized user_id, FKs, CHECK closeness)
-- [ ] Indexes migration (user_id, FKs, Feed composite, tag uniqueness)
-- [ ] RLS enable + FOR ALL policies (all 6 tables)
-- [ ] updated_at trigger
-- [ ] handle_new_user per-user sentiment seed trigger
-- [ ] `supabase db reset` clean apply
-- [ ] Smoke test: seed fires, user_id auto-set, anon sees 0 rows
-- [ ] `docs/data-model.md`
+- [x] `supabase init` + local start
+- [x] Enums migration (entry_type, goal_status)
+- [x] Tables migration (UUID PKs, denormalized user_id, FKs, CHECK closeness)
+- [x] Indexes migration (user_id, FKs, Feed composite + Profile composite, tag uniqueness)
+- [x] RLS enable + FOR ALL policies (all 6 tables) + GRANTs to authenticated
+- [x] updated_at trigger
+- [x] handle_new_user per-user sentiment seed trigger
+- [x] `supabase db reset` clean apply (6 migrations, no error)
+- [x] Smoke test: seed fires (3), anon denied, owner=3, user_id auto-set, closeness CHECK, FK RESTRICT, cross-user isolation, updated_at bumps
+- [x] `docs/data-model.md` + README local-Supabase section
 
 ## Success Criteria
 - `supabase db reset` applies all 6 migrations with no error.

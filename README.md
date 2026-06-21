@@ -38,6 +38,30 @@ npm run dev                  # http://localhost:3000
 
 **Never** add the Supabase `service_role` key to a `NEXT_PUBLIC_*` var — it bypasses RLS.
 
+## Local Supabase (development)
+
+Local-first: a full Postgres + Auth + Studio stack runs in Docker. Cloud project is only
+needed at deploy time (same migrations apply).
+
+```bash
+brew install supabase/tap/supabase   # one-time
+supabase start                       # boot local stack (Docker must be running)
+supabase status                      # print API URL + keys → put into .env.local
+supabase db reset                    # re-apply all migrations from scratch (+ seed)
+supabase stop                        # shut the stack down
+```
+
+| Service | URL |
+|---------|-----|
+| API | http://127.0.0.1:54321 |
+| Studio (browse/edit data) | http://127.0.0.1:54323 |
+| Mailpit (test auth emails) | http://127.0.0.1:54324 |
+| Postgres | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+
+- Schema lives in `supabase/migrations/` (version-controlled). See `docs/data-model.md`.
+- `psql` not on host? Use `docker exec -it supabase_db_NgMinh psql -U postgres`.
+- After a reboot, run `supabase start` again before `npm run dev`.
+
 ## Scripts
 
 | Command | Description |
