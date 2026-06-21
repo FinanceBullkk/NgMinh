@@ -33,6 +33,21 @@ export function EmployeeCardView({
         </span>
       </div>
 
+      {(e.nudges.cooling || e.nudges.stale1on1) && (
+        <div className="flex flex-wrap gap-1">
+          {e.nudges.cooling && (
+            <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+              Đang nguội
+            </span>
+          )}
+          {e.nudges.stale1on1 && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+              Lâu chưa 1:1
+            </span>
+          )}
+        </div>
+      )}
+
       <SentimentSparkline colors={e.sentimentColors} />
 
       {e.current_take && (

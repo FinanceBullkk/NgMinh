@@ -1,6 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Entry, FeedEntry } from "@/lib/types/models";
 
+// Daily reminder: has the manager logged anything dated `date` yet?
+export async function hasEntryOn(date: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("entries")
+    .select("id")
+    .eq("entry_date", date)
+    .limit(1);
+  if (error) throw error;
+  return (data?.length ?? 0) > 0;
+}
+
 // Profile timeline (by-person): one employee, newest first.
 export async function listEntriesByEmployee(employeeId: string): Promise<Entry[]> {
   const supabase = await createClient();

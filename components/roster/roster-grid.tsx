@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import type { EmployeeCard, Tag } from "@/lib/types/models";
+import type { EmployeeCard, SentimentOption, Tag } from "@/lib/types/models";
 import { EmployeeCardView } from "./employee-card";
 import { TagFilterBar } from "./tag-filter-bar";
 import { RosterSearch } from "./roster-search";
 import { EmptyRoster } from "./empty-roster";
+import { DailyReminder } from "./daily-reminder";
 import { EmployeeFormDialog } from "@/components/employee/employee-form-dialog";
 import {
   deleteEmployee,
@@ -14,12 +15,20 @@ import {
 
 type DialogState = { mode: "new" | "edit"; employee: EmployeeCard | null } | null;
 
+// Nudged employees float to the top (cooling outranks stale-1:1).
+const nudgeScore = (e: EmployeeCard) =>
+  (e.nudges.cooling ? 2 : 0) + (e.nudges.stale1on1 ? 1 : 0);
+
 export function RosterGrid({
   employees,
   tags,
+  sentiments,
+  hasEntryToday,
 }: {
   employees: EmployeeCard[];
   tags: Tag[];
+  sentiments: SentimentOption[];
+  hasEntryToday: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
@@ -47,13 +56,15 @@ export function RosterGrid({
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return employees.filter((e) => {
+    const filtered = employees.filter((e) => {
       if (selectedTags.size && !e.tags.some((t) => selectedTags.has(t.id)))
         return false;
       if (q && !e.name.toLowerCase().includes(q) && !contentIds.has(e.id))
         return false;
       return true;
     });
+    // Stable sort: nudged first, otherwise keep the name order from the query.
+    return [...filtered].sort((a, b) => nudgeScore(b) - nudgeScore(a));
   }, [employees, query, selectedTags, contentIds]);
 
   const toggleTag = (id: string) =>
@@ -87,6 +98,13 @@ export function RosterGrid({
           + Nhân viên
         </button>
       </div>
+
+      {!hasEntryToday && employees.length > 0 && (
+        <DailyReminder
+          employees={employees.map((e) => ({ id: e.id, name: e.name }))}
+          sentiments={sentiments}
+        />
+      )}
 
       <RosterSearch value={query} onChange={setQuery} />
       <TagFilterBar tags={tags} selected={selectedTags} onToggle={toggleTag} />

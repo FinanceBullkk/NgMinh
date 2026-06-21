@@ -11,6 +11,8 @@ import { TimelineList } from "@/components/profile/timeline-list";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
 import type { EmployeeCard, TimelineEntry } from "@/lib/types/models";
 import { buildSentimentColorSeries } from "@/lib/utils/sparkline-points";
+import { computeNudges } from "@/lib/utils/nudges";
+import { ReviewPack } from "@/components/profile/review-pack";
 
 export default async function ProfilePage({
   params,
@@ -42,8 +44,19 @@ export default async function ProfilePage({
 
   const sentimentColors = buildSentimentColorSeries(entries, allSentiments);
 
+  const weightById = new Map(allSentiments.map((s) => [s.id, s.weight]));
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Saigon" });
+  const nudges = computeNudges(
+    entries.map((e) => ({
+      type: e.type,
+      entry_date: e.entry_date,
+      weight: e.sentiment_id ? (weightById.get(e.sentiment_id) ?? null) : null,
+    })),
+    today,
+  );
+
   const activeSentiments = allSentiments.filter((s) => !s.is_archived);
-  const card: EmployeeCard = { ...employee, tags, sentimentColors };
+  const card: EmployeeCard = { ...employee, tags, sentimentColors, nudges };
 
   return (
     <div className="flex flex-col">
@@ -58,6 +71,7 @@ export default async function ProfilePage({
       <div className="px-4">
         <QuickAdd employeeId={employee.id} sentiments={activeSentiments} big />
       </div>
+      <ReviewPack employeeName={employee.name} entries={timeline} goals={goals} />
       <TimelineList entries={timeline} sentiments={activeSentiments} />
     </div>
   );

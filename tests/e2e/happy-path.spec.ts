@@ -29,7 +29,8 @@ test.describe("manager happy path", () => {
     await page.getByLabel("Mật khẩu").fill(user.password);
     await page.getByRole("button", { name: "Đăng nhập" }).click();
     await expect(page).toHaveURL("http://127.0.0.1:3100/");
-    await page.waitForLoadState("networkidle");
+    // Roster ready (auto-wait on a stable element instead of networkidle).
+    await expect(page.getByRole("heading", { name: "Roster" })).toBeVisible();
 
     await page.getByRole("button", { name: "+ Nhân viên", exact: true }).click();
     const employeeDialog = page.getByRole("dialog");
@@ -39,6 +40,10 @@ test.describe("manager happy path", () => {
     await expect(page.getByRole("link", { name: employeeName })).toBeVisible();
 
     await page.getByRole("link", { name: employeeName }).click();
+    // Wait for the profile URL — the Roster (incl. its daily-reminder "+ Ghi hôm nay"
+    // banner) then unmounts, so the only "+ Ghi hôm nay" left is the profile's preselected
+    // one. (The employee card name is also a heading, so a heading-wait is not enough.)
+    await page.waitForURL(/\/employees\/[0-9a-f-]+$/);
     await page.getByRole("button", { name: "+ Ghi hôm nay" }).click();
     const entryDialog = page.getByRole("dialog");
     await entryDialog.getByPlaceholder(/Quan sát cụ thể/).fill(observation);

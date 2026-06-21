@@ -56,8 +56,9 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
   any affected file in `docs/`.
 
 ## Current state
-- **MVP complete — all 9 phases ✅.** scaffold+PWA · schema/RLS/seed · auth+DAL · Roster · Profile · Feed · sentiment config+sparkline · Settings (tags+export+delete) · tests.
+- **MVP (9 phases) + spec Phase-2 features ✅.** Roster · Profile · Feed · sentiment config (with polarity `weight`) + sparkline · Settings (tags+export+delete) · **nudges** (cooling/stale-1:1) · **review pack** · **daily reminder**.
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only, `lib/supabase/admin.ts`) used ONLY for account deletion.
-- Tests: 28 green (16 unit + 11 integration + 1 e2e). `npm test` (needs `supabase start` + `npx playwright install chromium`). See `tests/README.md`.
-- Beyond MVP: Phase 2/3 features (nudges, review pack, daily reminder, AI summary) are spec'd but NOT built — out of current scope.
+- Tests: 41 green (29 unit + 11 integration + 1 e2e). `npm test` (needs `supabase start` + `npx playwright install chromium`). E2E runs against a **production build** (port 3100, distDir `test-dist-e2e`). See `tests/README.md`.
+- **DB migrations:** use `supabase migration up` on a populated DB — `supabase db reset` WIPES all local data.
+- Remaining (spec Phase 3, not built): AI summarize timeline, relationship map.
 - Notes: root middleware uses **`proxy.ts`** (Next 16 rename, not `middleware.ts`). Writes = Server Actions; reads = `lib/data/*`. Run `supabase start` before `npm run dev`. Regenerate types with `npm run gen:types` after migration changes.

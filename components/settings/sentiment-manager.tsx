@@ -22,19 +22,19 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
     .sort((a, b) => a.order_index - b.order_index);
   const archived = items.filter((s) => s.is_archived);
 
-  const onCreate = (label: string, color: string) =>
+  const onCreate = (label: string, color: string, weight: number) =>
     start(async () => {
-      const res = await createSentiment(label, color);
+      const res = await createSentiment(label, color, weight);
       if ("error" in res) return setError(res.error);
       setItems((p) => [...p, res.option]);
       setError("");
     });
 
-  const onUpdate = (id: string, label: string, color: string) =>
+  const onUpdate = (id: string, label: string, color: string, weight: number) =>
     start(async () => {
-      const res = await updateSentiment(id, label, color);
+      const res = await updateSentiment(id, label, color, weight);
       if (res.error) return setError(res.error);
-      setItems((p) => p.map((s) => (s.id === id ? { ...s, label, color } : s)));
+      setItems((p) => p.map((s) => (s.id === id ? { ...s, label, color, weight } : s)));
       setError("");
     });
 

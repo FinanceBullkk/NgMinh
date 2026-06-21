@@ -20,10 +20,12 @@ export type Tag = Tables<"tags">;
 export type EntryType = Enums<"entry_type">;
 export type GoalStatus = Enums<"goal_status">;
 
-// Roster card shape: an employee plus its tags and recent sentiment colors (sparkline).
+// Roster card shape: an employee plus its tags, recent sentiment colors (sparkline)
+// and action nudges (Phase 2). Nudge shape kept inline to avoid a circular import.
 export type EmployeeCard = Employee & {
   tags: Tag[];
   sentimentColors: string[];
+  nudges: { stale1on1: boolean; cooling: boolean };
 };
 
 // A timeline entry with its sentiment label+color resolved (incl. archived options).

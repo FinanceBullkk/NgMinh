@@ -204,6 +204,7 @@ export type Database = {
           label: string
           order_index: number
           user_id: string
+          weight: number
         }
         Insert: {
           color: string
@@ -213,6 +214,7 @@ export type Database = {
           label: string
           order_index?: number
           user_id?: string
+          weight?: number
         }
         Update: {
           color?: string
@@ -222,6 +224,7 @@ export type Database = {
           label?: string
           order_index?: number
           user_id?: string
+          weight?: number
         }
         Relationships: []
       }

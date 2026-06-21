@@ -20,9 +20,15 @@ async function requireUser() {
   return { supabase, user };
 }
 
+// Polarity is constrained to -1 / 0 / +1 (negative / neutral / positive).
+function normWeight(weight: number): number {
+  return weight > 0 ? 1 : weight < 0 ? -1 : 0;
+}
+
 export async function createSentiment(
   label: string,
   color: string,
+  weight = 0,
 ): Promise<{ option: SentimentOption } | { error: string }> {
   const l = label.trim();
   if (!l) return { error: "Tên trống." };
@@ -41,7 +47,7 @@ export async function createSentiment(
 
   const { data, error } = await supabase
     .from("sentiment_options")
-    .insert({ label: l, color: normalizeHex(color), order_index })
+    .insert({ label: l, color: normalizeHex(color), order_index, weight: normWeight(weight) })
     .select("*")
     .single();
   if (error) return { error: error.message };
@@ -54,6 +60,7 @@ export async function updateSentiment(
   id: string,
   label: string,
   color: string,
+  weight = 0,
 ): Promise<{ error?: string }> {
   const l = label.trim();
   if (!l) return { error: "Tên trống." };
@@ -64,7 +71,7 @@ export async function updateSentiment(
 
   const { error } = await supabase
     .from("sentiment_options")
-    .update({ label: l, color: normalizeHex(color) })
+    .update({ label: l, color: normalizeHex(color), weight: normWeight(weight) })
     .eq("id", id);
   if (error) return { error: error.message };
 
