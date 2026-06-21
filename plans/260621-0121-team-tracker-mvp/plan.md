@@ -32,7 +32,7 @@ No chart library (SVG sparkline). No AI (out of MVP scope).
 | 3 | Data/access layer + auth flow | [phase-03](phase-03-data-access-layer-auth-flow.md) | ✅ done | 6h | 1,2 |
 | 4 | Roster + employee CRUD + tags + search | [phase-04](phase-04-roster-employee-crud-tags-search.md) | ✅ done | 7h | 3 |
 | 5 | Profile (current_take, goals, timeline, quick-add) | [phase-05](phase-05-profile-take-goals-timeline-quickadd.md) | ✅ done | 8h | 3,4 |
-| 6 | Feed view (by-time) | [phase-06](phase-06-feed-by-time-view.md) | pending | 3h | 3,5 |
+| 6 | Feed view (by-time) | [phase-06](phase-06-feed-by-time-view.md) | ✅ done | 3h | 3,5 |
 | 7 | Configurable sentiment + sparkline component | [phase-07](phase-07-sentiment-config-sparkline.md) | pending | 5h | 3,4,5 |
 | 8 | Settings + export/delete | [phase-08](phase-08-settings-export-delete.md) | pending | 4h | 3,7 |
 | 9 | Testing (unit + integration + e2e) | [phase-09](phase-09-testing.md) | pending | 3h | 4-8 |

@@ -6,8 +6,10 @@
 
 ## Overview
 - **Priority:** P1 (the second query axis — weekly review without forgetting anyone)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Stream of ALL entries across all employees, grouped by day with relative headers (Hôm nay / Hôm qua / Tuần này / older dates), filterable by person / tag / type. Reuses timeline-entry rendering from Phase 5.
+- **Deviations:** person filter is single-select (KISS; tag/type are multi). Filters apply client-side over the loaded window; "load older" via offset server action (`loadMoreFeed`). `groupByDay` buckets all this-week days into one "Tuần này" group (clean headers). Removed the unused `listFeed()` DAL stub (superseded by `listFeedEntries`). Global quick-add (person picker) now wired here.
+- **Verified (e2e):** entries across 2 employees on 4 dates → correct day groups + explicit older date + cross-person names render. lint+build green.
 
 ## Key Insights
 - Same `entries` table, second axis (spec §2.2) — DRY: reuse `timeline-entry` component, add employee name/link since it's cross-person.
@@ -66,14 +68,14 @@
 8. Manual test: grouping correctness across day boundaries, all filter combos, links to profiles, load older.
 
 ## Todo List
-- [ ] DAL listFeedEntries (filters + joins + limit)
-- [ ] day-grouping util (relative labels, Asia/Saigon)
-- [ ] Feed Server Component + filter option lists
-- [ ] feed-filters (person/tag/type)
-- [ ] feed-list + day groups reusing timeline-entry (showEmployee)
-- [ ] Load older control
-- [ ] Quick-add from Feed (person picker)
-- [ ] Manual test grouping + filters + links
+- [x] DAL listFeedEntries (joins + range pagination)
+- [x] day-grouping util (relative labels, Asia/Saigon)
+- [x] Feed Server Component + filter option lists
+- [x] feed-filters (person/tag/type)
+- [x] feed-list + day groups reusing timeline-entry (employee link)
+- [x] Load older control (offset server action)
+- [x] Quick-add from Feed (person picker)
+- [x] e2e: grouping + cross-person names + explicit older date
 
 ## Success Criteria
 - Entries from all employees appear newest-first under correct day headers.

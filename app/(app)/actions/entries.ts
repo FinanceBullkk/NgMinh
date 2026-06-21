@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { EntryType } from "@/lib/types/models";
+import { listFeedEntries } from "@/lib/data/entries";
+import type { EntryType, FeedEntry } from "@/lib/types/models";
 
 // Append (spec §2.1): entries are immutable evidence — created, never edited in MVP.
 export async function createEntry(input: {
@@ -33,6 +34,14 @@ export async function createEntry(input: {
 
   revalidatePath("/"); // roster sparkline
   revalidatePath(`/employees/${input.employeeId}`); // profile timeline
-  revalidatePath("/feed"); // feed (Phase 6)
+  revalidatePath("/feed"); // feed
   return { ok: true };
+}
+
+// Feed pagination — fetch an older window (called from the client "load older").
+export async function loadMoreFeed(
+  offset: number,
+  limit = 50,
+): Promise<FeedEntry[]> {
+  return listFeedEntries(limit, offset);
 }

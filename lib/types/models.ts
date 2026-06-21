@@ -30,3 +30,8 @@ export type EmployeeCard = Employee & {
 export type TimelineEntry = Entry & {
   sentiment: { label: string; color: string } | null;
 };
+
+// Feed (cross-person) entry: timeline entry + the employee it belongs to.
+export type FeedEntry = TimelineEntry & {
+  employeeName: string;
+};

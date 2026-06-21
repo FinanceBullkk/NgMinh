@@ -56,6 +56,6 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
   any affected file in `docs/`.
 
 ## Current state
-- Phases 1–5 ✅ done: scaffold + PWA · Supabase schema/RLS/seed (local-first via CLI) · auth (`@supabase/ssr`) + DAL · Roster · Profile (current_take auto-save, goals, append-only timeline, quick-add).
-- Next: **Phase 6** — Feed (by-time view) + global quick-add with person picker.
+- Phases 1–6 ✅ done: scaffold + PWA · Supabase schema/RLS/seed · auth + DAL · Roster · Profile · Feed (by-time, day-grouped, filters, load-older).
+- Next: **Phase 7** — configurable sentiment (Settings) + real SVG sparkline.
 - Notes: root middleware uses **`proxy.ts`** (Next 16 rename, not `middleware.ts`). Writes = Server Actions; reads = `lib/data/*`. Run `supabase start` before `npm run dev`. Regenerate types with `npm run gen:types` after migration changes.

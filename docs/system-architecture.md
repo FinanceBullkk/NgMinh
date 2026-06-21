@@ -33,4 +33,5 @@ on `employee` is overwrite-in-place. Sentiment is configurable per user — neve
 - [x] Phase 3 — data/access layer + auth flow (`@supabase/ssr`, `proxy.ts`, login, DAL, e2e-verified)
 - [x] Phase 4 — Roster: employee CRUD + tags + name/content search (Server Component + Server Actions)
 - [x] Phase 5 — Profile: current_take auto-save, goals, append-only timeline + filters, shared quick-add
-- [ ] Phase 6–9 — see `plans/260621-0121-team-tracker-mvp/`
+- [x] Phase 6 — Feed: by-time view, day grouping (Asia/Saigon), person/tag/type filters, load-older
+- [ ] Phase 7–9 — see `plans/260621-0121-team-tracker-mvp/`
