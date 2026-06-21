@@ -7,7 +7,9 @@ import { dirname } from "node:path";
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
-  distDir: process["env"]["PORT"] === "3100" ? "test-dist-e2e" : undefined,
+  // Isolate the e2e build output so it never clobbers the dev `.next`. Gated on a
+  // dedicated var (NOT PORT — hosts inject PORT and would mis-route the build dir).
+  distDir: process.env.E2E_BUILD === "1" ? "test-dist-e2e" : undefined,
   turbopack: {
     root: projectRoot,
   },
