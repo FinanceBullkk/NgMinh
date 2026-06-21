@@ -61,6 +61,10 @@ export default async function ProfilePage({
   return (
     <div className="flex flex-col">
       <ProfileHeader employee={card} allTags={allTags} />
+      {/* Primary action stays in reach — sticks to the top once the header scrolls past. */}
+      <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white px-4 py-3">
+        <QuickAdd employeeId={employee.id} sentiments={activeSentiments} big />
+      </div>
       <div className="p-4">
         <CurrentTakeEditor
           employeeId={employee.id}
@@ -68,11 +72,8 @@ export default async function ProfilePage({
         />
       </div>
       <GoalsSection employeeId={employee.id} goals={goals} />
-      <div className="px-4">
-        <QuickAdd employeeId={employee.id} sentiments={activeSentiments} big />
-      </div>
       <ReviewPack employeeName={employee.name} entries={timeline} goals={goals} />
-      <TimelineList entries={timeline} sentiments={activeSentiments} />
+      <TimelineList entries={timeline} />
     </div>
   );
 }

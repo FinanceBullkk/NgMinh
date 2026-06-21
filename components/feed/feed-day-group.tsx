@@ -5,7 +5,7 @@ import { TimelineEntryRow } from "@/components/profile/timeline-entry";
 export function FeedDayGroup({ group }: { group: DayGroup<FeedEntry> }) {
   return (
     <section>
-      <h2 className="sticky top-0 bg-white/90 py-1 text-xs font-medium uppercase tracking-wide text-zinc-500 backdrop-blur">
+      <h2 className="sticky top-0 z-[5] border-b border-zinc-100 bg-white/95 py-2 text-xs font-bold uppercase tracking-wide text-zinc-500 backdrop-blur">
         {group.label}
       </h2>
       <ul className="flex flex-col">

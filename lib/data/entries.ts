@@ -1,5 +1,29 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Entry, FeedEntry } from "@/lib/types/models";
+import type { Entry, EntryType, FeedEntry } from "@/lib/types/models";
+
+type DbClient = Awaited<ReturnType<typeof createClient>>;
+
+// Resolve raw entry rows into FeedEntry: attach employee name + sentiment {label,color}
+// (config-driven, incl. archived options). Shared by the paginated and filtered queries.
+async function resolveFeedRows(
+  supabase: DbClient,
+  rows: Entry[],
+): Promise<FeedEntry[]> {
+  if (rows.length === 0) return [];
+  const [emps, sents] = await Promise.all([
+    supabase.from("employees").select("id, name"),
+    supabase.from("sentiment_options").select("id, label, color"),
+  ]);
+  const name = new Map((emps.data ?? []).map((e) => [e.id, e.name]));
+  const sent = new Map(
+    (sents.data ?? []).map((s) => [s.id, { label: s.label, color: s.color }]),
+  );
+  return rows.map((r) => ({
+    ...r,
+    employeeName: name.get(r.employee_id) ?? "—",
+    sentiment: r.sentiment_id ? (sent.get(r.sentiment_id) ?? null) : null,
+  }));
+}
 
 // Daily reminder: has the manager logged anything dated `date` yet?
 export async function hasEntryOn(date: string): Promise<boolean> {
@@ -40,20 +64,33 @@ export async function listFeedEntries(
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
   if (error) throw error;
-  if (!rows || rows.length === 0) return [];
+  return resolveFeedRows(supabase, rows ?? []);
+}
 
-  const [emps, sents] = await Promise.all([
-    supabase.from("employees").select("id, name"),
-    supabase.from("sentiment_options").select("id, label, color"),
-  ]);
-  const name = new Map((emps.data ?? []).map((e) => [e.id, e.name]));
-  const sent = new Map(
-    (sents.data ?? []).map((s) => [s.id, { label: s.label, color: s.color }]),
-  );
+// Feed filtered (GLOBAL): match across the WHOLE dataset, not just the loaded page, so
+// filtering by a person/type/tag surfaces older matches too (feed mock improvement #1).
+// `employeeIds` is the set allowed by the tag filter (resolved on the client from the
+// tag→employee map); pass null for "no tag constraint".
+export async function listFeedEntriesFiltered(filters: {
+  employeeId?: string | null;
+  types?: EntryType[];
+  employeeIds?: string[] | null;
+}): Promise<FeedEntry[]> {
+  // Tag filter that matches nobody → no rows, skip the query.
+  if (filters.employeeIds && filters.employeeIds.length === 0) return [];
 
-  return rows.map((r) => ({
-    ...r,
-    employeeName: name.get(r.employee_id) ?? "—",
-    sentiment: r.sentiment_id ? (sent.get(r.sentiment_id) ?? null) : null,
-  }));
+  const supabase = await createClient();
+  let query = supabase
+    .from("entries")
+    .select("*")
+    .order("entry_date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (filters.employeeId) query = query.eq("employee_id", filters.employeeId);
+  if (filters.types && filters.types.length) query = query.in("type", filters.types);
+  if (filters.employeeIds) query = query.in("employee_id", filters.employeeIds);
+
+  const { data: rows, error } = await query;
+  if (error) throw error;
+  return resolveFeedRows(supabase, rows ?? []);
 }

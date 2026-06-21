@@ -40,19 +40,23 @@ test.describe("manager happy path", () => {
     await expect(page.getByRole("link", { name: employeeName })).toBeVisible();
 
     await page.getByRole("link", { name: employeeName }).click();
-    // Wait for the profile URL — the Roster (incl. its daily-reminder "+ Ghi hôm nay"
-    // banner) then unmounts, so the only "+ Ghi hôm nay" left is the profile's preselected
-    // one. (The employee card name is also a heading, so a heading-wait is not enough.)
+    // Wait for the profile URL before opening quick-add — the profile's preselected
+    // "+ Ghi hôm nay" button is the only one with that label (the nav FAB is icon-only;
+    // the roster daily-reminder uses "+ Ghi"). A heading-wait is not enough since the
+    // employee card name is also a heading.
     await page.waitForURL(/\/employees\/[0-9a-f-]+$/);
     await page.getByRole("button", { name: "+ Ghi hôm nay" }).click();
     const entryDialog = page.getByRole("dialog");
     await entryDialog.getByPlaceholder(/Quan sát cụ thể/).fill(observation);
     await entryDialog.getByRole("button", { name: "Tích cực" }).click();
-    await entryDialog.getByRole("button", { name: "Lưu" }).click();
+    // exact: the quick-add now also has a "Lưu & ghi tiếp" button.
+    await entryDialog.getByRole("button", { name: "Lưu", exact: true }).click();
 
     const timelineEntry = page.getByRole("listitem").filter({ hasText: observation });
     await expect(timelineEntry).toBeVisible();
-    await expect(timelineEntry.getByRole("button")).toHaveCount(0);
+    // Append-only: the only per-entry action is delete (no edit/overwrite affordance).
+    await expect(timelineEntry.getByRole("button", { name: "Xoá ghi nhận" })).toHaveCount(1);
+    await expect(timelineEntry.getByRole("textbox")).toHaveCount(0);
 
     const take = page.getByLabel("Nhận định hiện tại");
     await take.fill(currentTake);

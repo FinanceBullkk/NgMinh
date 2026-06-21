@@ -1,19 +1,17 @@
 import { listFeedEntries } from "@/lib/data/entries";
 import { listEmployees } from "@/lib/data/employees";
 import { listTags, listEmployeeTagLinks } from "@/lib/data/tags";
-import { listSentimentOptions } from "@/lib/data/sentiment";
 import { FeedList } from "@/components/feed/feed-list";
 
 const PAGE = 50;
 
-// Feed (by-time): all entries across the roster, grouped by day.
+// Feed (by-time): all entries across the roster, grouped by day. Quick-add is the nav FAB.
 export default async function FeedPage() {
-  const [entries, employees, tags, links, sentiments] = await Promise.all([
+  const [entries, employees, tags, links] = await Promise.all([
     listFeedEntries(PAGE, 0),
     listEmployees(),
     listTags(),
     listEmployeeTagLinks(),
-    listSentimentOptions(),
   ]);
 
   const tagsByEmployee: Record<string, string[]> = {};
@@ -26,7 +24,6 @@ export default async function FeedPage() {
       employees={employees.map((e) => ({ id: e.id, name: e.name }))}
       tags={tags}
       tagsByEmployee={tagsByEmployee}
-      sentiments={sentiments}
     />
   );
 }

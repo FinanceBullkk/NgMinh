@@ -1,47 +1,37 @@
 "use client";
 
 import { ENTRY_TYPES } from "@/lib/constants/entry-types";
-import type { EntryType, SentimentOption } from "@/lib/types/models";
+import type { EntryType } from "@/lib/types/models";
 
+// Timeline filter as chips (Profile mock #6): one tap to view only Win / Lo ngại when
+// writing a review. "" = all types.
 export function TimelineFilters({
   type,
-  sentimentId,
-  sentiments,
   onType,
-  onSentiment,
 }: {
   type: EntryType | "";
-  sentimentId: string;
-  sentiments: SentimentOption[];
   onType: (t: EntryType | "") => void;
-  onSentiment: (id: string) => void;
 }) {
+  const chip = (on: boolean) =>
+    `rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+      on ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white text-zinc-600"
+    }`;
+
   return (
-    <div className="flex flex-wrap gap-2 text-sm">
-      <select
-        value={type}
-        onChange={(e) => onType(e.target.value as EntryType | "")}
-        className="rounded-md border border-zinc-300 px-2 py-1"
-      >
-        <option value="">Mọi loại</option>
-        {ENTRY_TYPES.map((t) => (
-          <option key={t.value} value={t.value}>
-            {t.label}
-          </option>
-        ))}
-      </select>
-      <select
-        value={sentimentId}
-        onChange={(e) => onSentiment(e.target.value)}
-        className="rounded-md border border-zinc-300 px-2 py-1"
-      >
-        <option value="">Mọi cảm nhận</option>
-        {sentiments.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.label}
-          </option>
-        ))}
-      </select>
+    <div className="flex flex-wrap gap-1.5">
+      <button onClick={() => onType("")} aria-pressed={!type} className={chip(!type)}>
+        Tất cả
+      </button>
+      {ENTRY_TYPES.map((t) => (
+        <button
+          key={t.value}
+          onClick={() => onType(t.value)}
+          aria-pressed={type === t.value}
+          className={chip(type === t.value)}
+        >
+          {t.label}
+        </button>
+      ))}
     </div>
   );
 }

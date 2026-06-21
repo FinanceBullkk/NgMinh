@@ -14,7 +14,7 @@ export function DailyReminder({
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#3f8f6b]/30 bg-[#3f8f6b]/5 px-4 py-3">
       <p className="text-sm">Hôm nay bạn đã ghi nhận ai chưa?</p>
-      <QuickAdd employees={employees} sentiments={sentiments} />
+      <QuickAdd employees={employees} sentiments={sentiments} triggerLabel="+ Ghi" />
     </div>
   );
 }

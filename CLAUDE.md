@@ -24,8 +24,9 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
 - Env: copy `.env.example` → `.env.local`, fill Supabase URL + publishable key (Phase 2+).
 
 ## Non-negotiable invariants (from spec — breaking these breaks the product)
-1. **Append vs Revise.** `entries` is append-only (evidence over time — never edit past
-   content). `employee.current_take` is overwrite-in-place. Two distinct behaviors; keep both.
+1. **Append vs Revise.** `entries` is append-only for *content* — never EDIT/overwrite a past
+   entry. Deleting a mis-entered entry is allowed (delete ≠ edit). `employee.current_take` is
+   overwrite-in-place. Keep these distinct behaviors.
 2. **One table, two axes.** Query the single `entries` table by-person (Profile) and
    by-time (Feed). Do not fork it into separate tables.
 3. **Configurable sentiment — never hardcoded.** Sentiment options live per-user in the DB
