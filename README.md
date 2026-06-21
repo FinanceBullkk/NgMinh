@@ -62,6 +62,24 @@ supabase stop                        # shut the stack down
 - `psql` not on host? Use `docker exec -it supabase_db_NgMinh psql -U postgres`.
 - After a reboot, run `supabase start` again before `npm run dev`.
 
+### Auth & accounts
+
+Single-user app — **no public sign-up**. Provision the one manager account manually:
+
+```bash
+# create the account against the local stack (or use Studio → Authentication → Add user)
+curl -s -X POST http://127.0.0.1:54321/auth/v1/signup \
+  -H "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"your-password"}'
+```
+
+Then log in at `/login`. Logged-out requests to any app route redirect to `/login`.
+Re-run after a `supabase db reset` (it wipes auth users too).
+
+### Regenerating DB types
+
+After changing migrations: `npm run gen:types` (writes `lib/types/database.ts`).
+
 ## Scripts
 
 | Command | Description |
@@ -70,6 +88,7 @@ supabase stop                        # shut the stack down
 | `npm run build` | Production build |
 | `npm run start` | Run production build |
 | `npm run lint` | ESLint |
+| `npm run gen:types` | Regenerate `lib/types/database.ts` from local schema |
 
 ## PWA / install
 

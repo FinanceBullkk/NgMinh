@@ -56,5 +56,6 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
   any affected file in `docs/`.
 
 ## Current state
-- Phase 1 ✅ done (scaffold + PWA). Next: **Phase 2** — Supabase schema + migrations + RLS + seed sentiment.
-- Phase 2 needs a Supabase project (URL + publishable key) before it can run end-to-end.
+- Phases 1–3 ✅ done: scaffold + PWA · Supabase schema/RLS/seed (local-first via CLI) · auth (`@supabase/ssr`) + DAL.
+- Next: **Phase 4** — Roster (employee CRUD + tags + search).
+- Notes: root middleware uses **`proxy.ts`** (Next 16 rename, not `middleware.ts`). Writes = Server Actions; reads = `lib/data/*`. Run `supabase start` before `npm run dev`. Regenerate types with `npm run gen:types` after migration changes.

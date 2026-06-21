@@ -29,7 +29,7 @@ No chart library (SVG sparkline). No AI (out of MVP scope).
 |---|-------|------|--------|--------|----------|
 | 1 | Project + tooling + PWA scaffold | [phase-01](phase-01-project-tooling-pwa-scaffold.md) | ✅ done | 4h | none |
 | 2 | Supabase schema + migrations + RLS + seed | [phase-02](phase-02-supabase-schema-migrations-rls.md) | ✅ done | 6h | 1 |
-| 3 | Data/access layer + auth flow | [phase-03](phase-03-data-access-layer-auth-flow.md) | pending | 6h | 1,2 |
+| 3 | Data/access layer + auth flow | [phase-03](phase-03-data-access-layer-auth-flow.md) | ✅ done | 6h | 1,2 |
 | 4 | Roster + employee CRUD + tags + search | [phase-04](phase-04-roster-employee-crud-tags-search.md) | pending | 7h | 3 |
 | 5 | Profile (current_take, goals, timeline, quick-add) | [phase-05](phase-05-profile-take-goals-timeline-quickadd.md) | pending | 8h | 3,4 |
 | 6 | Feed view (by-time) | [phase-06](phase-06-feed-by-time-view.md) | pending | 3h | 3,5 |

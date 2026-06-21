@@ -30,5 +30,5 @@ on `employee` is overwrite-in-place. Sentiment is configurable per user — neve
 
 - [x] Phase 1 — project + tooling + PWA scaffold
 - [x] Phase 2 — Supabase schema + migrations + RLS + seed (6 migrations, smoke-tested)
-- [ ] Phase 3 — data/access layer + auth flow
+- [x] Phase 3 — data/access layer + auth flow (`@supabase/ssr`, `proxy.ts`, login, DAL, e2e-verified)
 - [ ] Phase 4–9 — see `plans/260621-0121-team-tracker-mvp/`

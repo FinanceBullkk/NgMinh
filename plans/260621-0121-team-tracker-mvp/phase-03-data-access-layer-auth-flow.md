@@ -7,8 +7,10 @@
 
 ## Overview
 - **Priority:** P1 (every screen depends on this)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Wire `@supabase/ssr` clients (browser/server), session-refresh middleware + route protection, email/password login, sign-out, generated DB types, and a thin typed data-access module per entity.
+- **Deviation:** Next 16 deprecated the root `middleware.ts` convention → used **`proxy.ts`** (function `proxy`) instead; the Supabase helper stays `lib/supabase/middleware.ts`. Signup is provisioned manually (no public route) per the open question's MVP default.
+- **Verified (runtime e2e):** unauth `/` & `/feed` → 307 `/login`; `/login` 200; real session cookie → `/` 200 and `/login` → 307 `/`.
 
 ## Key Insights
 - Use `@supabase/ssr` (`createBrowserClient` / `createServerClient`); `@supabase/auth-helpers-nextjs` is removed/deprecated.
@@ -80,16 +82,16 @@
 10. Manual e2e: log in, land on Roster shell, refresh persists session, sign out returns to login, visiting `/` while logged out redirects.
 
 ## Todo List
-- [ ] Install @supabase/ssr + supabase-js
-- [ ] Browser + server clients (getAll/setAll)
-- [ ] updateSession middleware helper
-- [ ] Root middleware: refresh + protect + cache headers
-- [ ] Login route (form + signIn action)
-- [ ] Protected (app) layout with getUser guard
-- [ ] signOut action + nav wiring
-- [ ] Generate DB types + gen:types script
-- [ ] Per-entity DAL modules
-- [ ] Manual auth e2e (login/persist/signout/redirect)
+- [x] Install @supabase/ssr + supabase-js
+- [x] Browser + server clients (getAll/setAll)
+- [x] updateSession helper (`lib/supabase/middleware.ts`)
+- [x] Root proxy (`proxy.ts`): refresh + protect + cache headers (Next 16 rename)
+- [x] Login route (form + signIn action via useActionState)
+- [x] Protected (app) layout with getUser guard + bottom nav shell
+- [x] signOut action + nav wiring
+- [x] Generate DB types + gen:types script
+- [x] Per-entity DAL read modules (employees/entries/goals/tags/sentiment)
+- [x] Auth e2e (redirect both directions, session access) — automated curl + cookie test
 
 ## Success Criteria
 - Logging in with valid creds reaches Roster; invalid shows error.
