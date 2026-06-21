@@ -6,8 +6,10 @@
 
 ## Overview
 - **Priority:** P1 (data-control + privacy guarantees promised by spec §10)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Settings screen hosting sentiment manager (Phase 7) + tag management, full data export (download), and account/data deletion. Manager controls their own data.
+- **Deviations:** skipped `settings-sections.tsx` (composed directly in the page — KISS). Service-role client (`lib/supabase/admin.ts`, `import "server-only"`) used only for `auth.admin.deleteUser`. Note: locally the legacy service-role JWT is accepted by GoTrue admin (deleteUser ✓) but not the new-key-mode PostgREST data API — irrelevant since the app never uses admin for data reads.
+- **Verified (e2e):** export → 200 + attachment + all 6 tables; settings renders tags/export/delete; deleteAllData wipes employees+tags, keeps sentiments(3)+account; admin deleteUser removes the auth user (cascade wipes the rest via Phase-2 FKs).
 
 ## Key Insights
 - Export must include ALL user data (employees, entries, goals, tags, employee_tags, sentiment_options) in a portable format → JSON (and optionally CSV per table). JSON is simplest + lossless (KISS).
@@ -74,16 +76,16 @@
 9. Manual test: export downloads correct JSON; delete-all clears people but login + sentiment remain; delete-account removes everything and logs out.
 
 ## Todo List
-- [ ] Settings page + sections, mount sentiment-manager
-- [ ] tag-manager (rename/delete + cascade warning)
-- [ ] Export Route Handler (JSON, all tables, RLS)
-- [ ] admin.ts service-role client (server-only guard)
-- [ ] deleteAllData action (people data wipe)
-- [ ] deleteAccount action (admin.deleteUser + cascade + signout)
-- [ ] confirm-destructive-dialog (type-to-confirm)
-- [ ] data-controls UI wiring
-- [ ] .env.example + README service-role docs
-- [ ] Manual test export + both delete paths
+- [x] Settings page mounts sentiment-manager + tag-manager + data-controls
+- [x] tag-manager (rename/delete + cascade confirm)
+- [x] Export Route Handler (JSON, all 6 tables, RLS)
+- [x] admin.ts service-role client (server-only guard)
+- [x] deleteAllData action (people data wipe, keeps account+sentiments)
+- [x] deleteAccount action (admin.deleteUser + cascade + signout)
+- [x] confirm-destructive-dialog (type-to-confirm)
+- [x] data-controls UI wiring (export/delete-all/delete-account)
+- [x] .env.example + README service-role docs
+- [x] e2e: export + deleteAllData + deleteAccount paths
 
 ## Success Criteria
 - Export downloads a JSON containing all of the user's employees/entries/goals/tags/sentiment.

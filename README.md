@@ -35,8 +35,12 @@ npm run dev                  # http://localhost:3000
 |-----|---------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (public) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase anon/publishable key (public) |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Server-only** secret — used solely for account deletion |
 
 **Never** add the Supabase `service_role` key to a `NEXT_PUBLIC_*` var — it bypasses RLS.
+`SUPABASE_SERVICE_ROLE_KEY` (no `NEXT_PUBLIC_` prefix) is read only by server code
+(`lib/supabase/admin.ts`, guarded by `import "server-only"`) for `auth.admin.deleteUser`.
+For local dev, copy it from `supabase status` (the `SERVICE_ROLE_KEY` value).
 
 ## Local Supabase (development)
 

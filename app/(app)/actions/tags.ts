@@ -74,3 +74,40 @@ export async function removeTagFromEmployee(
   revalidatePath("/");
   return {};
 }
+
+// Global tag management (Settings).
+export async function renameTag(
+  id: string,
+  name: string,
+): Promise<{ error?: string }> {
+  const n = name.trim();
+  if (!n) return { error: "Tên trống." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Chưa đăng nhập." };
+
+  const { error } = await supabase.from("tags").update({ name: n }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/settings");
+  return {};
+}
+
+export async function deleteTag(id: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Chưa đăng nhập." };
+
+  // FK CASCADE removes the employee_tags links.
+  const { error } = await supabase.from("tags").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/settings");
+  return {};
+}

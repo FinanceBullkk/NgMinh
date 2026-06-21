@@ -56,7 +56,7 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
   any affected file in `docs/`.
 
 ## Current state
-- Phases 1–7 ✅ done: scaffold + PWA · schema/RLS/seed · auth + DAL · Roster · Profile · Feed · configurable sentiment (Settings) + real SVG sparkline.
-- `/settings` exists with the sentiment manager; Phase 8 extends it with tags management + export/delete.
-- Next: **Phase 8** — Settings: tags management + export (JSON) + delete account/data.
+- Phases 1–8 ✅ done: scaffold+PWA · schema/RLS/seed · auth+DAL · Roster · Profile · Feed · sentiment config+sparkline · Settings (tags + export + delete-all/delete-account).
+- `SUPABASE_SERVICE_ROLE_KEY` (server-only, `lib/supabase/admin.ts`) used ONLY for account deletion.
+- Next: **Phase 9** — automated tests (RLS isolation, append-only, sentiment archive, export/delete).
 - Notes: root middleware uses **`proxy.ts`** (Next 16 rename, not `middleware.ts`). Writes = Server Actions; reads = `lib/data/*`. Run `supabase start` before `npm run dev`. Regenerate types with `npm run gen:types` after migration changes.
