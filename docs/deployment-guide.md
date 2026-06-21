@@ -4,6 +4,12 @@ Recommended path for Next.js 16 + Supabase: **Vercel** hosts the frontend + Serv
 **Supabase Cloud** hosts Postgres/Auth/RLS. The app is deployable today. The one real gate is
 operational (manually provision the single account); the code is ready.
 
+## Live deployment (2026-06-21)
+- **App:** https://ng-minh.vercel.app (Vercel, GitHub integration)
+- **Supabase:** project `kkhctymyfkhlnowjrmmn` (`https://kkhctymyfkhlnowjrmmn.supabase.co`), Postgres 17, region ap-northeast-1
+- **Status:** all 7 migrations pushed; verified end-to-end in prod (auth, Server Actions, RLS isolation, seed trigger, PWA). 
+- **Remaining user steps:** (1) create your real manager account (dashboard → Authentication → Users → Add user → Auto Confirm); (2) set Auth → URL Configuration Site URL/Redirect to the app URL; (3) replace placeholder icons.
+
 ## 0. In-repo readiness (✅ already applied)
 - ✅ e2e build dir decoupled from `PORT` → gated on `E2E_BUILD=1` (`next.config.ts`); Playwright
   webServer sets `E2E_BUILD=1` for build+start. (Avoids hosts that inject `PORT` mis-routing the build.)
