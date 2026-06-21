@@ -25,3 +25,8 @@ export type EmployeeCard = Employee & {
   tags: Tag[];
   sentimentColors: string[];
 };
+
+// A timeline entry with its sentiment label+color resolved (incl. archived options).
+export type TimelineEntry = Entry & {
+  sentiment: { label: string; color: string } | null;
+};

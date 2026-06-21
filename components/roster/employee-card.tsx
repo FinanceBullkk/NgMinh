@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { EmployeeCard } from "@/lib/types/models";
 import { SparklineSlot } from "@/components/sparkline/sparkline-slot";
 import { closenessLabel } from "@/lib/utils/closeness";
@@ -20,7 +21,11 @@ export function EmployeeCardView({
     <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="truncate font-medium">{e.name}</h3>
+          <h3 className="truncate font-medium">
+            <Link href={`/employees/${e.id}`} className="hover:underline">
+              {e.name}
+            </Link>
+          </h3>
           {subtitle && <p className="truncate text-xs text-zinc-500">{subtitle}</p>}
         </div>
         <span className="shrink-0 rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">

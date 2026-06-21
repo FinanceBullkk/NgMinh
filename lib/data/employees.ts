@@ -24,6 +24,16 @@ export async function getEmployee(id: string): Promise<Employee | null> {
   return data;
 }
 
+export async function getEmployeeTagIds(employeeId: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("employee_tags")
+    .select("tag_id")
+    .eq("employee_id", employeeId);
+  if (error) throw error;
+  return (data ?? []).map((r) => r.tag_id);
+}
+
 // Roster card data: employees + tags + recent sentiment colors. Joins done in JS
 // (a few flat queries) to avoid nested-select typing friction and N+1 per card.
 export async function listEmployeesWithMeta(): Promise<EmployeeCard[]> {

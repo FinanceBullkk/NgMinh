@@ -88,3 +88,46 @@ export async function deleteEmployee(id: string): Promise<ActionState> {
 export async function searchEmployeeIdsByContent(q: string): Promise<string[]> {
   return dalSearch(q);
 }
+
+// Revise (spec §2.1): overwrite-in-place. Distinct from append (entries).
+export async function updateCurrentTake(
+  employeeId: string,
+  value: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Chưa đăng nhập." };
+
+  const { error } = await supabase
+    .from("employees")
+    .update({ current_take: value })
+    .eq("id", employeeId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/employees/${employeeId}`);
+  return {};
+}
+
+export async function updateCloseness(
+  employeeId: string,
+  value: number,
+): Promise<{ error?: string }> {
+  const n = clampCloseness(String(value));
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Chưa đăng nhập." };
+
+  const { error } = await supabase
+    .from("employees")
+    .update({ closeness: n })
+    .eq("id", employeeId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath(`/employees/${employeeId}`);
+  return {};
+}

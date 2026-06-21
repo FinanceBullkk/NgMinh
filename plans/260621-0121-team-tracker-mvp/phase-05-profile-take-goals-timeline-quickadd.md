@@ -6,8 +6,10 @@
 
 ## Overview
 - **Priority:** P1 (the differentiator — append-only evidence behind overwritable take)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Per-person view: header with name/tags/closeness slider + large auto-saving "Nhận định hiện tại" (current_take), Goals section, append-only Timeline (filter by type & sentiment), and the big "+ Ghi hôm nay" quick-add flow.
+- **Deviations:** skipped `lib/utils/debounce.ts` — the take editor uses inline ref-based debounce with flush-on-blur/unmount (finer control, avoids the React 19 set-state-in-effect rule). Goals use optimistic local state. Quick-add component already supports a person-picker (`employees` prop) but Profile passes a fixed `employeeId`; the global Roster/Feed quick-add is wired in Phase 6. Tag actions revalidate `/` only (Profile relies on the optimistic TagEditor).
+- **Verified (e2e):** append entries render in timeline, current_take renders, goal renders, roster sparkline reflects new entries. lint+build green.
 
 ## Key Insights
 - **Append vs Revise is the whole point** (spec §2.1): `entries` are append-only (no edit UI in MVP); `current_take` is overwritten continuously with auto-save. Keep these two mechanisms visibly distinct in UI and code.
@@ -78,16 +80,16 @@
 10. Manual test: add entries (append-only, can't edit past), edit take (auto-saves, survives reload), goals, timeline filters, quick-add speed.
 
 ## Todo List
-- [ ] entry-types constants
-- [ ] Profile Server Component (fetch all profile data)
-- [ ] profile-header + closeness slider (save)
-- [ ] current-take-editor auto-save + status + privacy hint
-- [ ] goals-section (add/toggle status)
-- [ ] timeline-list/entry/filters (type + sentiment)
-- [ ] quick-add-sheet (shared) + type/sentiment button rows
-- [ ] big "+ Ghi hôm nay" on Profile
-- [ ] createEntry revalidates roster + feed
-- [ ] Manual test append-only + take auto-save persistence
+- [x] entry-types constants
+- [x] Profile Server Component (fetch all profile data)
+- [x] profile-header + closeness slider (save on release)
+- [x] current-take-editor auto-save (debounce + flush) + status + privacy hint
+- [x] goals-section (add/toggle status, optimistic)
+- [x] timeline-list/entry/filters (type + sentiment, client-side)
+- [x] quick-add-sheet (shared) + type/sentiment button rows (data-driven colors)
+- [x] big "+ Ghi hôm nay" on Profile
+- [x] createEntry revalidates roster + profile + feed
+- [x] e2e: append renders, take renders, goal renders, sparkline updates
 
 ## Success Criteria
 - Adding an entry appends to timeline (newest first); no UI path edits/deletes past entries.
