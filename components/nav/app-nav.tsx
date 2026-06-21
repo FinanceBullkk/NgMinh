@@ -5,17 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { signOut } from "@/app/(app)/actions/sign-out";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
-import type { SentimentOption } from "@/lib/types/models";
 
 // Mobile-first bottom nav: icon tabs with an active state, a center FAB that opens
 // quick-add from any screen, and sign-out tucked under an Account tab (off the nav row).
-export function AppNav({
-  employees,
-  sentiments,
-}: {
-  employees: { id: string; name: string }[];
-  sentiments: SentimentOption[];
-}) {
+export function AppNav() {
   const path = usePathname();
   const isActive = (href: string) =>
     href === "/" ? path === "/" : path.startsWith(href);
@@ -30,8 +23,7 @@ export function AppNav({
         <AccountTab />
 
         <QuickAdd
-          employees={employees}
-          sentiments={sentiments}
+          lazy
           renderTrigger={(open) => (
             <button
               onClick={open}

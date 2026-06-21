@@ -5,19 +5,10 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { signOut } from "@/app/(app)/actions/sign-out";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
-import type { SentimentOption } from "@/lib/types/models";
 
 // Desktop-only left sidebar (≥ lg): logo, global quick-add (⌘K), nav with active state,
 // and the account/sign-out block at the bottom. Mobile uses the bottom nav instead.
-export function AppSidebar({
-  employees,
-  sentiments,
-  userEmail,
-}: {
-  employees: { id: string; name: string }[];
-  sentiments: SentimentOption[];
-  userEmail: string;
-}) {
+export function AppSidebar({ userEmail }: { userEmail: string }) {
   const path = usePathname();
   const isActive = (href: string) =>
     href === "/" ? path === "/" : path.startsWith(href);
@@ -33,8 +24,7 @@ export function AppSidebar({
       </div>
 
       <QuickAdd
-        employees={employees}
-        sentiments={sentiments}
+        lazy
         cmdK
         renderTrigger={(open) => (
           <button

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { createEntry } from "@/app/(app)/actions/entries";
+import { loadQuickAddData } from "@/app/(app)/actions/quick-add";
 import type { EntryType, SentimentOption } from "@/lib/types/models";
 import { TypeButtonRow } from "./type-button-row";
 import { SentimentButtonRow } from "./sentiment-button-row";
@@ -19,14 +20,18 @@ export function QuickAdd({
   triggerLabel = "+ Ghi hôm nay",
   renderTrigger,
   cmdK,
+  lazy,
 }: {
   employeeId?: string;
   employees?: { id: string; name: string }[];
-  sentiments: SentimentOption[];
+  sentiments?: SentimentOption[];
   big?: boolean;
   triggerLabel?: string;
   renderTrigger?: (open: () => void) => ReactNode;
   cmdK?: boolean;
+  // lazy: fetch employees + sentiments on first open (global nav/sidebar quick-add) instead
+  // of receiving them as props — keeps that data off every page navigation.
+  lazy?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -39,6 +44,15 @@ export function QuickAdd({
   const [sentimentId, setSentimentId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  // Lazy-loaded data (only in lazy mode); falls back to props otherwise.
+  const [loaded, setLoaded] = useState<{
+    employees: { id: string; name: string }[];
+    sentiments: SentimentOption[];
+  } | null>(null);
+  const [loadingData, setLoadingData] = useState(false);
+
+  const effEmployees = loaded?.employees ?? employees;
+  const effSentiments = loaded?.sentiments ?? sentiments ?? [];
 
   const focusContent = () =>
     setTimeout(() => contentRef.current?.focus(), 350); // after the slide-up
@@ -48,6 +62,12 @@ export function QuickAdd({
     setShowDate(false);
     setError("");
     setOpen(true);
+    if (lazy && !loaded && !loadingData) {
+      setLoadingData(true);
+      loadQuickAddData()
+        .then(setLoaded)
+        .finally(() => setLoadingData(false));
+    }
   };
   const closeSheet = () => setOpen(false);
 
@@ -105,6 +125,8 @@ export function QuickAdd({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // openSheet is stable enough for this global hotkey; re-binding only on cmdK.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cmdK]);
 
   // ⌘/Ctrl + Enter saves while the sheet is open.
@@ -178,11 +200,14 @@ export function QuickAdd({
               />
             )}
 
-            {!employeeId && employees && (
+            {!employeeId && (
               <div>
                 <div className="mb-1.5 text-xs font-semibold text-zinc-500">Nhân viên</div>
                 <div className="flex flex-wrap gap-2">
-                  {employees.map((e) => {
+                  {loadingData && !effEmployees && (
+                    <span className="text-sm text-zinc-400">Đang tải…</span>
+                  )}
+                  {(effEmployees ?? []).map((e) => {
                     const on = emp === e.id;
                     return (
                       <button
@@ -220,7 +245,7 @@ export function QuickAdd({
 
             <div>
               <div className="mb-1.5 text-xs font-semibold text-zinc-500">Cảm nhận</div>
-              <SentimentButtonRow sentiments={sentiments} value={sentimentId} onChange={setSentimentId} />
+              <SentimentButtonRow sentiments={effSentiments} value={sentimentId} onChange={setSentimentId} />
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}

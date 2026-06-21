@@ -35,7 +35,9 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
 4. **RLS on every table.** Every table carries `user_id`; RLS `FOR ALL` using
    `(select auth.uid()) = user_id`. This is sensitive data about real people — treat it so.
 5. **Writes via Server Actions only.** Never mutate Supabase from a Server Component
-   render. Server-side auth checks use `getUser()` (not `getSession()`).
+   render. Server-side auth must VERIFY the token — `getUser()` (middleware refresh) or
+   `getClaims()` (verifies the JWT signature; local & fast with asymmetric keys). Never
+   `getSession()` (unverified).
 6. **No AI in MVP.** AI summarize / relationship-map are Phase 3, out of scope — do not
    design tech around them now.
 
