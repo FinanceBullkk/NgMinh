@@ -19,3 +19,9 @@ export type Tag = Tables<"tags">;
 
 export type EntryType = Enums<"entry_type">;
 export type GoalStatus = Enums<"goal_status">;
+
+// Roster card shape: an employee plus its tags and recent sentiment colors (sparkline).
+export type EmployeeCard = Employee & {
+  tags: Tag[];
+  sentimentColors: string[];
+};

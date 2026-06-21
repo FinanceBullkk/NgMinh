@@ -6,8 +6,10 @@
 
 ## Overview
 - **Priority:** P1 (home screen / primary entry point)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Roster home: card grid per employee (name, role/team, closeness, current_take excerpt, sparkline slot), multi-select tag filter + search (matches name AND note content), add/edit/delete employee, tag management on employee.
+- **Deviations:** plain Tailwind + native `<dialog>` (no shadcn — YAGNI); `window.confirm` for delete guard; tag editor lives in the **edit** dialog (create → then edit to tag); `sparkline-slot` renders minimal time-ordered dots now (richer component in Phase 7). Search hybrid as planned (name+tags client-side, content via debounced server action).
+- **Verified (e2e vs running dev server):** authenticated render shows employee + tag; content `ilike` search finds employee; cleanup leaves empty roster. lint+build green.
 
 ## Key Insights
 - Search must match BOTH employee name AND entry `content` (spec §3) — needs a query that unions name matches with employees having matching entries. Do server-side via Postgres `ilike` (DAL) to keep it simple; for MVP dataset (a manager's direct reports, tens of employees) no full-text index needed (YAGNI) — note as a Phase-2 scale item.
@@ -74,16 +76,16 @@
 10. Manual test: CRUD, tag assign/filter, name+content search, mobile layout.
 
 ## Todo List
-- [ ] DAL listEmployeesWithMeta + searchEmployeeIdsByContent
-- [ ] Roster Server Component + grid
-- [ ] employee-card with sparkline slot
-- [ ] tag-filter-bar (multi-select) + debounced search (name + content)
-- [ ] employee-form-dialog (create/edit)
-- [ ] create/update/delete employee actions
-- [ ] tag-editor + tag actions
-- [ ] Empty state + add CTA
-- [ ] Mobile-first responsive grid
-- [ ] Manual CRUD/filter/search test
+- [x] DAL listEmployeesWithMeta + searchEmployeeIdsByContent
+- [x] Roster Server Component + grid
+- [x] employee-card with sparkline slot
+- [x] tag-filter-bar (multi-select) + debounced search (name + content)
+- [x] employee-form-dialog (create/edit, native dialog)
+- [x] create/update/delete employee actions (revalidatePath)
+- [x] tag-editor (optimistic) + tag actions (create/add/remove)
+- [x] Empty state + add CTA
+- [x] Mobile-first responsive grid (1/2/3 cols)
+- [x] e2e render + search test (authenticated)
 
 ## Success Criteria
 - Create/edit/delete employee works and persists; list reflects changes without manual reload.
