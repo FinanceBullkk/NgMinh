@@ -6,8 +6,10 @@
 
 ## Overview
 - **Priority:** P1 (signature feature + the only configurable taxonomy in MVP)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Sentiment management UI (CRUD + reorder + archive-not-delete) and the hand-rendered SVG sparkline (colored dots per entry over time) used on Roster cards and Profile header. Sentiment color drives sparkline color.
+- **Deviations:** sparkline takes `colors: string[]` (ordered) not `{date,color}` points — colors already computed in DAL/profile, so skipped the `sparkline-points` util. DAL uses existing `listSentimentOptions` (active) + `listAllSentimentOptions` (all) instead of an `{includeArchived}` param. Reorder via ↑/↓ arrows (not drag). **Mounted the sentiment manager in a new `/settings` page now** (plan deferred to Phase 8) so it's reachable + testable; Phase 8 extends Settings with tags + export/delete.
+- **Verified (e2e):** settings renders config; archived option keeps history color; real sparkline (svg+line) on roster; archived hidden from quick-add; ≥1-active guard in action.
 
 ## Key Insights
 - **No hardcoded sentiment levels** (spec §6). Defaults (3) are seeded per-user in Phase 2; this phase lets the manager add/edit/reorder/archive them.
@@ -70,15 +72,15 @@
 9. Manual test: add new sentiment → appears in quick-add; archive in-use → hidden from picker, history keeps color; reorder reflects in button order + config; sparkline colors match.
 
 ## Todo List
-- [ ] sentiment-sparkline SVG component (+ empty/aria)
-- [ ] sparkline-points util (order/cap/archived colors)
-- [ ] Wire real sparkline into roster card + profile header
-- [ ] hex-color validation util
-- [ ] DAL listSentimentOptions(includeArchived)
-- [ ] sentiment-manager (add/edit/reorder/archive/unarchive)
-- [ ] sentiment actions + "≥1 active" guard + revalidation
-- [ ] Verify quick-add sentiment buttons use live config
-- [ ] Manual test config↔sparkline↔history propagation
+- [x] sentiment-sparkline SVG component (+ empty/aria + baseline)
+- [x] sparkline colors computed in DAL/profile (util not needed — see deviation)
+- [x] Wire real sparkline into roster card + profile header (placeholder deleted)
+- [x] hex-color validation util
+- [x] DAL all/active sentiment options (incl. archived for history)
+- [x] sentiment-manager (add/edit/reorder/archive/unarchive) + /settings page
+- [x] sentiment actions + "≥1 active" guard + revalidation
+- [x] quick-add sentiment buttons use live active config (verified)
+- [x] e2e: config render, archived-keeps-color, real sparkline, archived-hidden
 
 ## Success Criteria
 - Adding/editing a sentiment updates quick-add buttons and any new dots immediately.

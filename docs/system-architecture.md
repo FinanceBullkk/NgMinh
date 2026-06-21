@@ -34,4 +34,5 @@ on `employee` is overwrite-in-place. Sentiment is configurable per user — neve
 - [x] Phase 4 — Roster: employee CRUD + tags + name/content search (Server Component + Server Actions)
 - [x] Phase 5 — Profile: current_take auto-save, goals, append-only timeline + filters, shared quick-add
 - [x] Phase 6 — Feed: by-time view, day grouping (Asia/Saigon), person/tag/type filters, load-older
-- [ ] Phase 7–9 — see `plans/260621-0121-team-tracker-mvp/`
+- [x] Phase 7 — Configurable sentiment (Settings) + real SVG sparkline (archive-not-delete keeps history color)
+- [ ] Phase 8–9 — see `plans/260621-0121-team-tracker-mvp/`

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { EmployeeCard } from "@/lib/types/models";
-import { SparklineSlot } from "@/components/sparkline/sparkline-slot";
+import { SentimentSparkline } from "@/components/sparkline/sentiment-sparkline";
 import { closenessLabel } from "@/lib/utils/closeness";
 
 export function EmployeeCardView({
@@ -33,7 +33,7 @@ export function EmployeeCardView({
         </span>
       </div>
 
-      <SparklineSlot colors={e.sentimentColors} />
+      <SentimentSparkline colors={e.sentimentColors} />
 
       {e.current_take && (
         <p className="line-clamp-2 text-sm text-zinc-700">{e.current_take}</p>
