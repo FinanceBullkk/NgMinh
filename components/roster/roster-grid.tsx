@@ -88,17 +88,53 @@ export function RosterGrid({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Roster</h1>
-        <button
-          onClick={() => setDialog({ mode: "new", employee: null })}
-          className="rounded-md bg-[#3f8f6b] px-3 py-2 text-sm font-medium text-white"
-        >
-          + Nhân viên
-        </button>
+    <div className="flex flex-col gap-4 p-4 lg:px-8 lg:py-6">
+      {/*
+       * Top bar
+       * Mobile: H1 + add button stacked in a single row (existing behaviour).
+       * Desktop (≥ lg): H1 + muted count on the left; search input + add button on the right.
+       * The RosterSearch component is hidden in the mobile top bar (appears below instead).
+       */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
+        {/* Left: title + count */}
+        <div className="flex items-center justify-between gap-2 lg:justify-start lg:gap-3">
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight">Roster</h1>
+            <span className="text-sm text-zinc-400">
+              {employees.length} nhân viên
+            </span>
+          </div>
+
+          {/* "+ Nhân viên" button — shown in the left group on mobile only */}
+          <button
+            onClick={() => setDialog({ mode: "new", employee: null })}
+            className="rounded-md bg-[#3f8f6b] px-3 py-2 text-sm font-medium text-white lg:hidden"
+          >
+            + Nhân viên
+          </button>
+        </div>
+
+        {/* Right: search (desktop width controlled inside RosterSearch) + add button */}
+        <div className="flex items-center gap-3">
+          {/* Search is always rendered; on mobile it spans full width, on desktop it has fixed width */}
+          <div className="flex-1 lg:flex-none">
+            <RosterSearch value={query} onChange={setQuery} />
+          </div>
+
+          {/* "+ Nhân viên" button — desktop only */}
+          <button
+            onClick={() => setDialog({ mode: "new", employee: null })}
+            className="hidden shrink-0 rounded-md bg-[#3f8f6b] px-3 py-2 text-sm font-medium text-white lg:flex lg:items-center lg:gap-1"
+          >
+            + Nhân viên
+          </button>
+        </div>
       </div>
 
+      {/* Tag filter chips */}
+      <TagFilterBar tags={tags} selected={selectedTags} onToggle={toggleTag} />
+
+      {/* Daily reminder banner */}
       {!hasEntryToday && employees.length > 0 && (
         <DailyReminder
           employees={employees.map((e) => ({ id: e.id, name: e.name }))}
@@ -106,16 +142,14 @@ export function RosterGrid({
         />
       )}
 
-      <RosterSearch value={query} onChange={setQuery} />
-      <TagFilterBar tags={tags} selected={selectedTags} onToggle={toggleTag} />
-
+      {/* Card grid: 1 col mobile → 2 col sm → 3 col xl */}
       {visible.length === 0 ? (
         <EmptyRoster
           onAdd={() => setDialog({ mode: "new", employee: null })}
           filtered={employees.length > 0}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visible.map((e) => (
             <EmployeeCardView
               key={e.id}

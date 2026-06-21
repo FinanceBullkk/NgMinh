@@ -21,7 +21,7 @@ export function AppNav({
     href === "/" ? path === "/" : path.startsWith(href);
 
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-zinc-200 bg-white/95 backdrop-blur">
+    <nav className="sticky bottom-0 z-30 border-t border-zinc-200 bg-white/95 backdrop-blur lg:hidden">
       <div className="relative mx-auto flex h-[68px] max-w-md items-stretch justify-between px-6 pt-2">
         <NavTab href="/" label="Roster" active={isActive("/")} icon={<RosterIcon />} />
         <NavTab href="/feed" label="Feed" active={isActive("/feed")} icon={<FeedIcon />} />

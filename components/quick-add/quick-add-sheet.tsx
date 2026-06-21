@@ -18,6 +18,7 @@ export function QuickAdd({
   big,
   triggerLabel = "+ Ghi hôm nay",
   renderTrigger,
+  cmdK,
 }: {
   employeeId?: string;
   employees?: { id: string; name: string }[];
@@ -25,6 +26,7 @@ export function QuickAdd({
   big?: boolean;
   triggerLabel?: string;
   renderTrigger?: (open: () => void) => ReactNode;
+  cmdK?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -92,6 +94,19 @@ export function QuickAdd({
     });
   };
 
+  // ⌘/Ctrl + K opens quick-add from anywhere (desktop, spec: Web mocks).
+  useEffect(() => {
+    if (!cmdK) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        openSheet();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [cmdK]);
+
   // ⌘/Ctrl + Enter saves while the sheet is open.
   useEffect(() => {
     if (!open) return;
@@ -132,7 +147,7 @@ export function QuickAdd({
         className="sheet"
       >
         <div className="flex max-h-[90dvh] flex-col">
-          <div className="flex justify-center pt-2.5 pb-0.5">
+          <div className="flex justify-center pt-2.5 pb-0.5 lg:hidden">
             <span className="h-1.5 w-9 rounded-full bg-zinc-300" aria-hidden />
           </div>
 
