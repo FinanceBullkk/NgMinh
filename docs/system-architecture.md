@@ -28,6 +28,9 @@ on `employee` is overwrite-in-place. Sentiment is configurable per user — neve
 
 ## Phase status
 
+Plan progress: **9/9 phases (100%) — MVP complete**. Last verified 2026-06-21 with clean
+lint, production build, and 28 passing tests (16 unit + 11 integration + 1 e2e).
+
 - [x] Phase 1 — project + tooling + PWA scaffold
 - [x] Phase 2 — Supabase schema + migrations + RLS + seed (6 migrations, smoke-tested)
 - [x] Phase 3 — data/access layer + auth flow (`@supabase/ssr`, `proxy.ts`, login, DAL, e2e-verified)
@@ -36,4 +39,4 @@ on `employee` is overwrite-in-place. Sentiment is configurable per user — neve
 - [x] Phase 6 — Feed: by-time view, day grouping (Asia/Saigon), person/tag/type filters, load-older
 - [x] Phase 7 — Configurable sentiment (Settings) + real SVG sparkline (archive-not-delete keeps history color)
 - [x] Phase 8 — Settings: tag management + JSON export + delete-all-data + delete-account (service-role, server-only)
-- [ ] Phase 9 — see `plans/260621-0121-team-tracker-mvp/`
+- [x] Phase 9 — Testing: 16 unit + 11 integration (real RLS) + 1 e2e happy path

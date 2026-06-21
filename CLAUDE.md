@@ -56,7 +56,8 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
   any affected file in `docs/`.
 
 ## Current state
-- Phases 1–8 ✅ done: scaffold+PWA · schema/RLS/seed · auth+DAL · Roster · Profile · Feed · sentiment config+sparkline · Settings (tags + export + delete-all/delete-account).
+- **MVP complete — all 9 phases ✅.** scaffold+PWA · schema/RLS/seed · auth+DAL · Roster · Profile · Feed · sentiment config+sparkline · Settings (tags+export+delete) · tests.
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only, `lib/supabase/admin.ts`) used ONLY for account deletion.
-- Next: **Phase 9** — automated tests (RLS isolation, append-only, sentiment archive, export/delete).
+- Tests: 28 green (16 unit + 11 integration + 1 e2e). `npm test` (needs `supabase start` + `npx playwright install chromium`). See `tests/README.md`.
+- Beyond MVP: Phase 2/3 features (nudges, review pack, daily reminder, AI summary) are spec'd but NOT built — out of current scope.
 - Notes: root middleware uses **`proxy.ts`** (Next 16 rename, not `middleware.ts`). Writes = Server Actions; reads = `lib/data/*`. Run `supabase start` before `npm run dev`. Regenerate types with `npm run gen:types` after migration changes.

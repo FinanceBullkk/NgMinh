@@ -7,6 +7,7 @@ import { dirname } from "node:path";
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  distDir: process["env"]["PORT"] === "3100" ? "test-dist-e2e" : undefined,
   turbopack: {
     root: projectRoot,
   },

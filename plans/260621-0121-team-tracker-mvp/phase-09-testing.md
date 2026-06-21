@@ -6,8 +6,10 @@
 
 ## Overview
 - **Priority:** P1 (protect core invariants before daily use)
-- **Status:** pending
+- **Status:** ✅ done (2026-06-21)
 - **Description:** Test matrix covering pure-util unit tests, data-layer/RLS integration tests against a real local Supabase, and a thin happy-path E2E for the most-used flows. Right-sized for a single-user MVP (no over-testing — YAGNI).
+- **Result:** 28 tests green — **16 unit + 11 integration + 1 e2e**. lint + production build clean.
+- **Deviations:** integration/e2e read creds live from `supabase status` (no `.env.test` file). To make logic unit-testable, extracted pure helpers `lib/utils/sparkline-points.ts` and `lib/data/user-data.ts` (export/delete) and wired them into the DAL/actions. E2E builds to `test-dist-e2e/` on port 3100 (`next.config.ts` distDir) so it doesn't clobber the dev `.next`. Added those generated dirs to ESLint ignores.
 
 ## Key Insights
 - Highest-value tests protect the invariants that make this app correct: RLS isolation, append-only timeline, current_take overwrite independence, sentiment archive preserves history color, export completeness, delete completeness.
@@ -77,17 +79,17 @@
 11. Run full suite; fix failures (no skipping, no fake passes).
 
 ## Todo List
-- [ ] Vitest + Playwright setup + scripts
-- [ ] supabase-test-clients helper (2 users, cleanup)
-- [ ] Unit: day-grouping, sparkline-points, hex-color, closeness
-- [ ] Integration: RLS isolation (6 tables)
-- [ ] Integration: user_id default + spoof rejection
-- [ ] Integration: new-user seed = 3
-- [ ] Integration: append-only + current_take independence
-- [ ] Integration: sentiment archive + FK RESTRICT
-- [ ] Integration: export + delete-all + delete-account
-- [ ] E2E happy path
-- [ ] Full suite green
+- [x] Vitest + Playwright setup + scripts
+- [x] supabase-test-clients helper (2 users, cleanup)
+- [x] Unit: day-grouping, sparkline-points, hex-color, closeness (16 tests)
+- [x] Integration: RLS isolation (6 tables)
+- [x] Integration: user_id default + spoof rejection
+- [x] Integration: new-user seed = 3
+- [x] Integration: append-only + current_take independence
+- [x] Integration: sentiment archive + FK RESTRICT
+- [x] Integration: export + delete-all + delete-account
+- [x] E2E happy path
+- [x] Full suite green (28 tests) + tests/README + lint/build clean
 
 ## Success Criteria
 - All unit + integration + e2e tests pass against local Supabase.

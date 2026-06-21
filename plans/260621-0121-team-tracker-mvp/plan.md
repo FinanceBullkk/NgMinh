@@ -1,7 +1,7 @@
 ---
 title: "Manager's Team Tracker — MVP"
 description: "Private single-user PWA for a manager to log append-only observations on direct reports, prep 1:1s, and write bias-free reviews."
-status: pending
+status: complete
 priority: P2
 effort: ~46h
 branch: main
@@ -19,7 +19,7 @@ Signature: hand-rendered SVG sparkline colored by configurable sentiment.
 **Source of truth:** `/team-tracker-spec.md` · **Research:** `research/` (3 reports)
 
 ## Stack (decided)
-Next.js 15 App Router + TypeScript + Tailwind v4 + Supabase (Postgres/Auth/RLS via `@supabase/ssr`).
+Next.js 16 App Router + TypeScript + Tailwind v4 + Supabase (Postgres/Auth/RLS via `@supabase/ssr`).
 Native `app/manifest.ts` PWA (no service worker for MVP). Email/password auth. Server Actions for writes.
 No chart library (SVG sparkline). No AI (out of MVP scope).
 
@@ -35,7 +35,9 @@ No chart library (SVG sparkline). No AI (out of MVP scope).
 | 6 | Feed view (by-time) | [phase-06](phase-06-feed-by-time-view.md) | ✅ done | 3h | 3,5 |
 | 7 | Configurable sentiment + sparkline component | [phase-07](phase-07-sentiment-config-sparkline.md) | ✅ done | 5h | 3,4,5 |
 | 8 | Settings + export/delete | [phase-08](phase-08-settings-export-delete.md) | ✅ done | 4h | 3,7 |
-| 9 | Testing (unit + integration + e2e) | [phase-09](phase-09-testing.md) | pending | 3h | 4-8 |
+| 9 | Testing (unit + integration + e2e) | [phase-09](phase-09-testing.md) | ✅ done | 3h | 4-8 |
+
+**Progress:** 9/9 phases (100%) · MVP complete · 28 tests green (16 unit + 11 integration + 1 e2e) · lint + build clean · last verified 2026-06-21.
 
 **Total: 9 phases (~46h).** Phases 1-3 strictly sequential (foundation). 4 unblocks 5; 6/7 depend on 5; 8 depends on 7; 9 last.
 

@@ -53,12 +53,15 @@ export function CurrentTakeEditor({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Nhận định hiện tại</label>
+        <label htmlFor="current-take" className="text-sm font-medium">
+          Nhận định hiện tại
+        </label>
         <span className="text-xs text-zinc-400">
           {status === "saving" ? "đang lưu…" : status === "saved" ? "đã lưu" : ""}
         </span>
       </div>
       <textarea
+        id="current-take"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onBlur={() => {

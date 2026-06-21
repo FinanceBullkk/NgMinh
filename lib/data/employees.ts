@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Employee, EmployeeCard, Tag } from "@/lib/types/models";
+import { buildSentimentColorSeries } from "@/lib/utils/sparkline-points";
 
 // Reads are RLS-scoped to the current user. Writes live in Server Actions, not here.
 
@@ -44,7 +45,7 @@ export async function listEmployeesWithMeta(): Promise<EmployeeCard[]> {
     supabase.from("tags").select("*"),
     supabase
       .from("entries")
-      .select("employee_id, sentiment_id")
+      .select("employee_id, sentiment_id, entry_date, created_at")
       .order("entry_date", { ascending: true })
       .order("created_at", { ascending: true }),
     supabase.from("sentiment_options").select("id, color"),
@@ -52,15 +53,11 @@ export async function listEmployeesWithMeta(): Promise<EmployeeCard[]> {
   const error = emps.error || links.error || tags.error || entries.error || sentiments.error;
   if (error) throw error;
 
-  const colorById = new Map((sentiments.data ?? []).map((s) => [s.id, s.color]));
-  const colorsByEmp = new Map<string, string[]>();
+  const entriesByEmp = new Map<string, typeof entries.data>();
   for (const e of entries.data ?? []) {
-    if (!e.sentiment_id) continue;
-    const color = colorById.get(e.sentiment_id);
-    if (!color) continue;
-    const arr = colorsByEmp.get(e.employee_id) ?? [];
-    arr.push(color);
-    colorsByEmp.set(e.employee_id, arr);
+    const rows = entriesByEmp.get(e.employee_id) ?? [];
+    rows.push(e);
+    entriesByEmp.set(e.employee_id, rows);
   }
 
   const tagById = new Map<string, Tag>((tags.data ?? []).map((t) => [t.id, t]));
@@ -76,7 +73,10 @@ export async function listEmployeesWithMeta(): Promise<EmployeeCard[]> {
   return (emps.data ?? []).map((e) => ({
     ...e,
     tags: tagsByEmp.get(e.id) ?? [],
-    sentimentColors: (colorsByEmp.get(e.id) ?? []).slice(-20), // last 20, time order
+    sentimentColors: buildSentimentColorSeries(
+      entriesByEmp.get(e.id) ?? [],
+      sentiments.data ?? [],
+    ),
   }));
 }
 

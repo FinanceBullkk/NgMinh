@@ -10,6 +10,7 @@ import { GoalsSection } from "@/components/profile/goals-section";
 import { TimelineList } from "@/components/profile/timeline-list";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
 import type { EmployeeCard, TimelineEntry } from "@/lib/types/models";
+import { buildSentimentColorSeries } from "@/lib/utils/sparkline-points";
 
 export default async function ProfilePage({
   params,
@@ -39,12 +40,7 @@ export default async function ProfilePage({
     sentiment: e.sentiment_id ? (sentMap.get(e.sentiment_id) ?? null) : null,
   }));
 
-  // Sparkline wants oldest → newest; entries arrive newest-first.
-  const sentimentColors = entries
-    .map((e) => (e.sentiment_id ? sentMap.get(e.sentiment_id)?.color : undefined))
-    .filter((c): c is string => Boolean(c))
-    .reverse()
-    .slice(-20);
+  const sentimentColors = buildSentimentColorSeries(entries, allSentiments);
 
   const activeSentiments = allSentiments.filter((s) => !s.is_archived);
   const card: EmployeeCard = { ...employee, tags, sentimentColors };

@@ -7,8 +7,13 @@
 # testing
 /coverage
 
+# playwright output
+/playwright-report
+/test-results
+
 # next.js
 /.next/
+/test-dist-e2e/
 /out/
 
 # production

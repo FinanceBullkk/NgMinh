@@ -93,6 +93,16 @@ After changing migrations: `npm run gen:types` (writes `lib/types/database.ts`).
 | `npm run start` | Run production build |
 | `npm run lint` | ESLint |
 | `npm run gen:types` | Regenerate `lib/types/database.ts` from local schema |
+| `npm run test:unit` | Vitest unit tests (no DB) |
+| `npm run test:integration` | Vitest integration tests (needs local Supabase) |
+| `npm run test:e2e` | Playwright happy-path E2E (needs local Supabase + chromium) |
+| `npm test` | All of the above |
+
+## Testing
+
+See [`tests/README.md`](tests/README.md). Unit tests need nothing; integration + E2E need
+`supabase start` running (creds read from `supabase status`) and create throwaway users that
+never touch your real data. E2E also needs `npx playwright install chromium` once.
 
 ## PWA / install
 
@@ -102,4 +112,4 @@ After changing migrations: `npm run gen:types` (writes `lib/types/database.ts`).
 
 ## Project docs
 
-See [`docs/`](docs/) — `system-architecture.md`, `code-standards.md`.
+See [`docs/`](docs/) — start with `project-roadmap.md`, `system-architecture.md`, and `code-standards.md`.
