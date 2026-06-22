@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
-import { loadQuickAddData } from "@/app/(app)/actions/quick-add";
+import { fetchQuickAddData } from "@/lib/data/quick-add-client";
 import { revalidateAfterEntryWrite, prependEntryToFeed } from "@/lib/swr-revalidate";
 import { createClient } from "@/lib/supabase/client";
 import type { EntryType, FeedEntry, SentimentOption } from "@/lib/types/models";
@@ -63,9 +63,11 @@ export function QuickAdd({
     setShowDate(false);
     setError("");
     setOpen(true);
-    if (lazy && !loaded && !loadingData) {
+    // Refetch on every open (keeps showing the previous list meanwhile) so newly added
+    // employees appear without a reload.
+    if (lazy && !loadingData) {
       setLoadingData(true);
-      loadQuickAddData()
+      fetchQuickAddData()
         .then(setLoaded)
         .finally(() => setLoadingData(false));
     }
