@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
-import { createEntry } from "@/app/(app)/actions/entries";
 import { loadQuickAddData } from "@/app/(app)/actions/quick-add";
-import { revalidateAfterEntryWrite } from "@/lib/swr-revalidate";
-import type { EntryType, SentimentOption } from "@/lib/types/models";
+import { revalidateAfterEntryWrite, prependEntryToFeed } from "@/lib/swr-revalidate";
+import { createClient } from "@/lib/supabase/client";
+import type { EntryType, FeedEntry, SentimentOption } from "@/lib/types/models";
 import { TypeButtonRow } from "./type-button-row";
 import { SentimentButtonRow } from "./sentiment-button-row";
 
@@ -93,16 +93,40 @@ export function QuickAdd({
     const targetId = employeeId ?? emp;
     if (!targetId) return setError("Chọn nhân viên.");
     if (!content.trim()) return setError("Nhập nội dung.");
+    const text = content.trim();
+    const entryDate = date || todayISO();
+    const sent = effSentiments.find((s) => s.id === sentimentId) ?? null;
+    const who = effEmployees?.find((e) => e.id === targetId)?.name ?? "—";
+
+    // Show the new note immediately in the Feed cache, then write it directly to Supabase
+    // (browser→DB, fast) and reconcile. No slow server-action round-trip on the hot path.
+    const optimistic: FeedEntry = {
+      id: `tmp-${entryDate}-${text.length}`,
+      user_id: "",
+      employee_id: targetId,
+      entry_date: entryDate,
+      type,
+      content: text,
+      sentiment_id: sentimentId,
+      created_at: new Date().toISOString(),
+      employeeName: who,
+      sentiment: sent ? { label: sent.label, color: sent.color } : null,
+    };
+    void prependEntryToFeed(optimistic);
+
     start(async () => {
-      const res = await createEntry({
-        employeeId: targetId,
-        entry_date: date,
+      const { error: insErr } = await createClient().from("entries").insert({
+        employee_id: targetId,
+        entry_date: entryDate,
         type,
-        content: content.trim(),
+        content: text,
         sentiment_id: sentimentId,
       });
-      if (res.error) return setError(res.error);
-      void revalidateAfterEntryWrite(); // refresh client caches (feed/roster/profile)
+      if (insErr) {
+        void revalidateAfterEntryWrite(); // roll the optimistic entry back
+        return setError(insErr.message);
+      }
+      void revalidateAfterEntryWrite(); // reconcile feed/roster/profile with the real row
       if (again) {
         setContent("");
         setSentimentId(null);
