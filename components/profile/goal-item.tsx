@@ -3,19 +3,26 @@
 import { useTransition } from "react";
 import { updateGoalStatus } from "@/app/(app)/actions/goals";
 import type { Goal, GoalStatus } from "@/lib/types/models";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 export function GoalItem({
   goal,
+  employeeId,
   onStatusChange,
 }: {
   goal: Goal;
+  // Needed to revalidate the SWR profile cache after a status change so ReviewPack refreshes.
+  employeeId: string;
   onStatusChange: (status: GoalStatus) => void;
 }) {
   const [pending, start] = useTransition();
   const set = (s: GoalStatus) =>
     start(async () => {
       const res = await updateGoalStatus(goal.id, s);
-      if (!res.error) onStatusChange(s);
+      if (!res.error) {
+        onStatusChange(s);
+        void revalidateKey(`profile:${employeeId}`);
+      }
     });
 
   const muted = goal.status !== "open";

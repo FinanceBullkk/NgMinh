@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { createGoal } from "@/app/(app)/actions/goals";
 import type { Goal, GoalStatus } from "@/lib/types/models";
 import { GoalItem } from "./goal-item";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 export function GoalsSection({
   employeeId,
@@ -24,6 +25,8 @@ export function GoalsSection({
       if ("goal" in res) {
         setGoals((prev) => [res.goal, ...prev]);
         setContent("");
+        // Revalidate profile SWR cache so ReviewPack + any goal-derived data refreshes.
+        void revalidateKey(`profile:${employeeId}`);
       }
     });
   };
@@ -36,7 +39,7 @@ export function GoalsSection({
       <h2 className="text-sm font-medium">Goals</h2>
       <ul className="flex flex-col gap-1">
         {goals.map((g) => (
-          <GoalItem key={g.id} goal={g} onStatusChange={(s) => onStatusChange(g.id, s)} />
+          <GoalItem key={g.id} goal={g} employeeId={employeeId} onStatusChange={(s) => onStatusChange(g.id, s)} />
         ))}
         {goals.length === 0 && (
           <li className="text-xs text-zinc-400">Chưa có goal.</li>

@@ -7,6 +7,7 @@ import {
   createTag,
 } from "@/app/(app)/actions/tags";
 import type { EmployeeCard, Tag } from "@/lib/types/models";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 // Optimistic local tag list so edits feel live inside the open dialog;
 // the server actions revalidate the roster behind it.
@@ -27,13 +28,19 @@ export function TagEditor({
   const add = (t: Tag) =>
     start(async () => {
       const res = await addTagToEmployee(employee.id, t.id);
-      if (!res.error) setTags((prev) => [...prev, t]);
+      if (!res.error) {
+        setTags((prev) => [...prev, t]);
+        void revalidateKey(`profile:${employee.id}`);
+      }
     });
 
   const remove = (t: Tag) =>
     start(async () => {
       const res = await removeTagFromEmployee(employee.id, t.id);
-      if (!res.error) setTags((prev) => prev.filter((x) => x.id !== t.id));
+      if (!res.error) {
+        setTags((prev) => prev.filter((x) => x.id !== t.id));
+        void revalidateKey(`profile:${employee.id}`);
+      }
     });
 
   const createAndAdd = () =>
@@ -43,6 +50,7 @@ export function TagEditor({
         await addTagToEmployee(employee.id, res.id);
         setTags((prev) => [...prev, { ...allTagPlaceholder(res.id, newName) }]);
         setNewName("");
+        void revalidateKey(`profile:${employee.id}`);
       }
     });
 

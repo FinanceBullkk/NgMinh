@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { deleteEntry } from "@/app/(app)/actions/entries";
+import { revalidateAfterEntryWrite } from "@/lib/swr-revalidate";
 
 // Profile-only: remove a mis-entered timeline entry (with confirm). Append-only still
 // forbids editing content — this deletes the whole row, it never overwrites it.
@@ -17,6 +18,7 @@ export function DeleteEntryButton({
     if (!window.confirm("Xoá ghi nhận này? Không thể hoàn tác.")) return;
     start(async () => {
       await deleteEntry(entryId, employeeId);
+      void revalidateAfterEntryWrite();
     });
   };
   return (

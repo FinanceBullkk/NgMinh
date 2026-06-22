@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { createTag, deleteTag } from "@/app/(app)/actions/tags";
 import type { Tag } from "@/lib/types/models";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 // TagManager: chip-style tag list + inline add input.
 // Spec: card with existing tags as chips (each with ✕ remove), input "Tên tag mới…" + dark "Thêm" button.
@@ -27,6 +28,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
       });
       setNewName("");
       setError("");
+      revalidateKey("settings");
     });
   };
 
@@ -37,6 +39,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
       if (res.error) return setError(res.error);
       setTags((prev) => prev.filter((t) => t.id !== id));
       setError("");
+      revalidateKey("settings");
     });
   };
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { createEntry } from "@/app/(app)/actions/entries";
 import { loadQuickAddData } from "@/app/(app)/actions/quick-add";
+import { revalidateAfterEntryWrite } from "@/lib/swr-revalidate";
 import type { EntryType, SentimentOption } from "@/lib/types/models";
 import { TypeButtonRow } from "./type-button-row";
 import { SentimentButtonRow } from "./sentiment-button-row";
@@ -101,6 +102,7 @@ export function QuickAdd({
         sentiment_id: sentimentId,
       });
       if (res.error) return setError(res.error);
+      void revalidateAfterEntryWrite(); // refresh client caches (feed/roster/profile)
       if (again) {
         setContent("");
         setSentimentId(null);

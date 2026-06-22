@@ -1,22 +1,7 @@
-import { listAllSentimentOptions } from "@/lib/data/sentiment";
-import { listTags } from "@/lib/data/tags";
-import { SentimentManager } from "@/components/settings/sentiment-manager";
-import { TagManager } from "@/components/settings/tag-manager";
-import { DataControls } from "@/components/settings/data-controls";
+import { SettingsView } from "@/components/settings/settings-view";
 
-// Settings page: sentiment config + tag management + data controls.
-// Desktop (≥ lg): centered column max-w-[720px]. Mobile: full-width column with p-4.
-export default async function SettingsPage() {
-  const [sentiments, tags] = await Promise.all([
-    listAllSentimentOptions(),
-    listTags(),
-  ]);
-  return (
-    <main className="flex flex-col gap-8 p-4 lg:mx-auto lg:max-w-[720px] lg:px-7 lg:py-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-      <SentimentManager initial={sentiments} />
-      <TagManager initial={tags} />
-      <DataControls />
-    </main>
-  );
+// Settings (by-config): rendered client-side. The browser fetches directly from Supabase (RLS),
+// so navigation doesn't pay an SSR round-trip through the serverless function. See settings-view.
+export default function SettingsPage() {
+  return <SettingsView />;
 }

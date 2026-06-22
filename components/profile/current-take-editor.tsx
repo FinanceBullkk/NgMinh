@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { updateCurrentTake } from "@/app/(app)/actions/employees";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 type Status = "idle" | "saving" | "saved";
 
@@ -27,6 +28,8 @@ export function CurrentTakeEditor({
     if (!res.error) {
       saved.current = v;
       setStatus("saved");
+      // Refresh SWR profile cache so current_take stays in sync after the debounced save.
+      void revalidateKey(`profile:${employeeId}`);
     } else {
       setStatus("idle");
     }

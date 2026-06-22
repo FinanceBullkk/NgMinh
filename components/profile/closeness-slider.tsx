@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateCloseness } from "@/app/(app)/actions/employees";
 import { closenessLabel } from "@/lib/utils/closeness";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 // variant="slider" (default): full-width range slider used in the mobile header.
 // variant="pips":  compact pip row used in the desktop header right column.
@@ -17,7 +18,12 @@ export function ClosenessSlider({
 }) {
   const [value, setValue] = useState(initial ?? 3);
   const [, start] = useTransition();
-  const save = (v: number) => start(() => void updateCloseness(employeeId, v));
+  // After the action resolves, revalidate the SWR profile cache so closeness propagates.
+  const save = (v: number) =>
+    start(async () => {
+      await updateCloseness(employeeId, v);
+      void revalidateKey(`profile:${employeeId}`);
+    });
 
   if (variant === "pips") {
     // Desktop compact: "Mức hiểu ● ● ● ○ ○  Vừa"

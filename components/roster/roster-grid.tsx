@@ -12,6 +12,7 @@ import {
   deleteEmployee,
   searchEmployeeIdsByContent,
 } from "@/app/(app)/actions/employees";
+import { revalidateKey } from "@/lib/swr-revalidate";
 
 type DialogState = { mode: "new" | "edit"; employee: EmployeeCard | null } | null;
 
@@ -82,8 +83,10 @@ export function RosterGrid({
       )
     )
       return;
-    startDelete(() => {
-      void deleteEmployee(e.id);
+    startDelete(async () => {
+      await deleteEmployee(e.id);
+      // Refresh SWR cache so the card disappears without a full reload.
+      void revalidateKey("roster");
     });
   };
 
@@ -166,7 +169,11 @@ export function RosterGrid({
           mode={dialog.mode}
           employee={dialog.employee}
           allTags={tags}
-          onClose={() => setDialog(null)}
+          onClose={() => {
+            setDialog(null);
+            // Refresh roster after create/edit/tag changes so the card reflects new data.
+            void revalidateKey("roster");
+          }}
         />
       )}
     </div>

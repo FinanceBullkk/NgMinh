@@ -9,6 +9,7 @@ import {
   archiveSentiment,
   unarchiveSentiment,
 } from "@/app/(app)/actions/sentiment";
+import { revalidateKey } from "@/lib/swr-revalidate";
 import { SentimentRow } from "./sentiment-row";
 import { SentimentForm } from "./sentiment-form";
 
@@ -53,6 +54,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
       if ("error" in res) return setError(res.error);
       setItems((p) => [...p, res.option]);
       setError("");
+      revalidateKey("settings");
     });
 
   const onUpdate = (id: string, label: string, color: string, weight: number) =>
@@ -63,6 +65,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
         p.map((s) => (s.id === id ? { ...s, label, color, weight } : s)),
       );
       setError("");
+      revalidateKey("settings");
     });
 
   const onArchive = (id: string) =>
@@ -73,6 +76,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
         p.map((s) => (s.id === id ? { ...s, is_archived: true } : s)),
       );
       setError("");
+      revalidateKey("settings");
     });
 
   const onUnarchive = (id: string) =>
@@ -83,6 +87,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
         p.map((s) => (s.id === id ? { ...s, is_archived: false } : s)),
       );
       setError("");
+      revalidateKey("settings");
     });
 
   // Up/down reorder — keep working without UI arrows (data integrity preserved).
@@ -102,6 +107,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
     start(async () => {
       const res = await reorderSentiment(ids);
       if (res.error) setError(res.error);
+      else revalidateKey("settings");
     });
   };
 
