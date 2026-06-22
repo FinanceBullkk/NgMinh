@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { createTag, deleteTag } from "@/app/(app)/actions/tags";
 import type { Tag } from "@/lib/types/models";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 // TagManager: chip-style tag list + inline add input.
 // Spec: card with existing tags as chips (each with ✕ remove), input "Tên tag mới…" + dark "Thêm" button.

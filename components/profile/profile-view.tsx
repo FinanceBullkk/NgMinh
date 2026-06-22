@@ -5,8 +5,7 @@
 // After any write the caller calls revalidateKey(`profile:${employeeId}`) so
 // SWR refetches and all data-derived UI (sparkline, nudges, etc.) updates.
 
-import useSWR from "swr";
-import { fetchProfile } from "@/lib/data/profile-client";
+import { useEntry, cache } from "@/lib/cache";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { CurrentTakeEditor } from "@/components/profile/current-take-editor";
 import { GoalsSection } from "@/components/profile/goals-section";
@@ -51,11 +50,7 @@ function ProfileSkeleton() {
 
 // ── Main export ──────────────────────────────────────────────────────────────
 export function ProfileView({ employeeId }: { employeeId: string }) {
-  const { data, error } = useSWR(
-    `profile:${employeeId}`,
-    () => fetchProfile(employeeId),
-    { revalidateOnFocus: true, keepPreviousData: true },
-  );
+  const { data, error } = useEntry(cache.profile(employeeId));
 
   if (error) {
     return (

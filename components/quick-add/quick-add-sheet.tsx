@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { fetchQuickAddData } from "@/lib/data/quick-add-client";
-import { invalidate, prependEntryToFeed } from "@/lib/swr-revalidate";
+import { invalidate, cache } from "@/lib/cache";
 import { createClient } from "@/lib/supabase/client";
 import { todayInSaigon } from "@/lib/utils/today";
 import type { EntryType, FeedEntry, SentimentOption } from "@/lib/types/models";
@@ -115,7 +115,7 @@ export function QuickAdd({
       employeeName: who,
       sentiment: sent ? { label: sent.label, color: sent.color } : null,
     };
-    void prependEntryToFeed(optimistic);
+    void cache.feed.prepend(optimistic);
 
     start(async () => {
       const { error: insErr } = await createClient().from("entries").insert({

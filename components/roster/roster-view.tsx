@@ -1,16 +1,12 @@
 "use client";
 
-import useSWR from "swr";
-import { fetchRoster } from "@/lib/data/roster-client";
+import { useEntry, cache } from "@/lib/cache";
 import { RosterGrid } from "./roster-grid";
 
 // Client-rendered Roster: fetches directly from Supabase (browser→DB), cached by SWR so
 // revisiting the tab shows data instantly and refreshes in the background.
 export function RosterView() {
-  const { data, error } = useSWR("roster", () => fetchRoster(), {
-    revalidateOnFocus: true,
-    keepPreviousData: true,
-  });
+  const { data, error } = useEntry(cache.roster);
 
   if (error) {
     return (

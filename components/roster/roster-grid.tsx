@@ -12,7 +12,7 @@ import {
   deleteEmployee,
   searchEmployeeIdsByContent,
 } from "@/app/(app)/actions/employees";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 type DialogState = { mode: "new" | "edit"; employee: EmployeeCard | null } | null;
 

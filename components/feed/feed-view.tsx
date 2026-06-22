@@ -1,18 +1,12 @@
 "use client";
 
-import useSWR from "swr";
-import { fetchFeedBootstrap } from "@/lib/data/feed-client";
+import { useEntry, cache, FEED_PAGE } from "@/lib/cache";
 import { FeedList } from "./feed-list";
-
-const PAGE = 50;
 
 // Client-rendered Feed: fetches directly from Supabase (browser→DB), cached by SWR so
 // revisiting the tab shows data instantly and refreshes in the background (Firebase-like).
 export function FeedView() {
-  const { data, error } = useSWR("feed-bootstrap", () => fetchFeedBootstrap(PAGE), {
-    revalidateOnFocus: true,
-    keepPreviousData: true,
-  });
+  const { data, error } = useEntry(cache.feed);
 
   if (error) {
     return <p className="p-4 text-sm text-red-600">Không tải được Feed. Thử tải lại trang.</p>;
@@ -22,7 +16,7 @@ export function FeedView() {
   return (
     <FeedList
       initialEntries={data.entries}
-      pageSize={PAGE}
+      pageSize={FEED_PAGE}
       employees={data.employees}
       tags={data.tags}
       tagsByEmployee={data.tagsByEmployee}

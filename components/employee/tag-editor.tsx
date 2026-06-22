@@ -7,7 +7,7 @@ import {
   createTag,
 } from "@/app/(app)/actions/tags";
 import type { EmployeeCard, Tag } from "@/lib/types/models";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 // Optimistic local tag list so edits feel live inside the open dialog;
 // the server actions revalidate the roster behind it.

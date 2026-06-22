@@ -1,7 +1,6 @@
 "use client";
 
-import useSWR from "swr";
-import { fetchSettings } from "@/lib/data/settings-client";
+import { useEntry, cache } from "@/lib/cache";
 import { SentimentManager } from "./sentiment-manager";
 import { TagManager } from "./tag-manager";
 import { DataControls } from "./data-controls";
@@ -9,10 +8,7 @@ import { DataControls } from "./data-controls";
 // Client-rendered Settings: fetches directly from Supabase (browser→DB), cached by SWR so
 // navigation back to Settings is instant (shows cached data, revalidates in background).
 export function SettingsView() {
-  const { data, error } = useSWR("settings", fetchSettings, {
-    revalidateOnFocus: true,
-    keepPreviousData: true,
-  });
+  const { data, error } = useEntry(cache.settings);
 
   if (error) {
     return (

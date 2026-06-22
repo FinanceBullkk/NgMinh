@@ -9,7 +9,7 @@ import {
   archiveSentiment,
   unarchiveSentiment,
 } from "@/app/(app)/actions/sentiment";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 import { SentimentRow } from "./sentiment-row";
 import { SentimentForm } from "./sentiment-form";
 

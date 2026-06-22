@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateCloseness } from "@/app/(app)/actions/employees";
 import { closenessLabel } from "@/lib/utils/closeness";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 // variant="slider" (default): full-width range slider used in the mobile header.
 // variant="pips":  compact pip row used in the desktop header right column.

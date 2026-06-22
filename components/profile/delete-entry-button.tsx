@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { deleteEntry } from "@/app/(app)/actions/entries";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 // Profile-only: remove a mis-entered timeline entry (with confirm). Append-only still
 // forbids editing content — this deletes the whole row, it never overwrites it.

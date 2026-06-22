@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { createGoal } from "@/app/(app)/actions/goals";
 import type { Goal, GoalStatus } from "@/lib/types/models";
 import { GoalItem } from "./goal-item";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 export function GoalsSection({
   employeeId,

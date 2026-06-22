@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { updateCurrentTake } from "@/app/(app)/actions/employees";
-import { invalidate } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/cache";
 
 type Status = "idle" | "saving" | "saved";
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { keyMatcher } from "@/lib/utils/cache-keys";
+import { keyMatcher } from "@/lib/cache/match";
 
 // Guards the centralized SWR invalidation fan-out (the structural fix for the
 // "stale after write" bug class).
