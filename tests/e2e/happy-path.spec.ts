@@ -7,6 +7,10 @@ import {
 } from "@/tests/setup/supabase-test-clients";
 
 test.describe("manager happy path", () => {
+  // Mobile-first flow: at < lg the profile shows the sticky "+ Ghi hôm nay" button and the
+  // bottom nav. (Desktop ≥ lg swaps in the sidebar + a "Ghi cho {name}" header button.)
+  test.use({ viewport: { width: 390, height: 844 } });
+
   let admin: TestClient;
   let user: TestUser;
 
