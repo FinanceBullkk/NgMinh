@@ -2,16 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { signOut } from "@/app/(app)/actions/sign-out";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
+import { createClient } from "@/lib/supabase/client";
 
 // Desktop-only left sidebar (≥ lg): logo, global quick-add (⌘K), nav with active state,
 // and the account/sign-out block at the bottom. Mobile uses the bottom nav instead.
-export function AppSidebar({ userEmail }: { userEmail: string }) {
+// Reads the user email client-side so the app shell can stay static (fast CDN navigation).
+export function AppSidebar() {
   const path = usePathname();
   const isActive = (href: string) =>
     href === "/" ? path === "/" : path.startsWith(href);
+
+  const [userEmail, setUserEmail] = useState("");
+  useEffect(() => {
+    createClient()
+      .auth.getClaims()
+      .then(({ data }) => {
+        const email = data?.claims?.email;
+        if (typeof email === "string") setUserEmail(email);
+      })
+      .catch(() => {});
+  }, []);
   const initial = (userEmail.trim()[0] ?? "M").toUpperCase();
 
   return (
