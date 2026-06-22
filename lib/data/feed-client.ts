@@ -8,6 +8,10 @@ import type { Entry, EntryType, FeedEntry, Tag } from "@/lib/types/models";
 
 type DbClient = ReturnType<typeof createClient>;
 
+// Hard cap on a single filtered Feed query (audit M4) — bounds an unbounded `.in()` scan. The
+// PostgREST `max_rows` setting also caps server-side; this makes the client intent explicit.
+const FEED_FILTER_CAP = 500;
+
 // Attach employeeName + sentiment {label,color} to raw entry rows. Exported so the Calendar
 // (which reads a month-scoped slice of the same `entries` table) resolves rows identically.
 export async function resolveFeedRows(supabase: DbClient, rows: Entry[]): Promise<FeedEntry[]> {
@@ -102,7 +106,7 @@ export async function fetchFeedFiltered(filters: {
   if (filters.employeeId) query = query.eq("employee_id", filters.employeeId);
   if (filters.types && filters.types.length) query = query.in("type", filters.types);
   if (filters.employeeIds) query = query.in("employee_id", filters.employeeIds);
-  const { data, error } = await query;
+  const { data, error } = await query.limit(FEED_FILTER_CAP);
   if (error) throw error;
   return resolveFeedRows(supabase, data ?? []);
 }

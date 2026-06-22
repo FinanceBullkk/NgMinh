@@ -1,16 +1,24 @@
 # Project Roadmap
 
-> Last verified: 2026-06-21 · Source: `plans/260621-0121-team-tracker-mvp/`
+> Last verified: 2026-06-22 · Source: `plans/260621-0121-team-tracker-mvp/` +
+> `plans/260622-2213-security-remediation-rls-auth/`
 
 ## Current status
 
 | Metric | Result |
 |--------|--------|
-| Plan status | In progress |
-| Phase progress | 8/9 complete (88.9%) |
-| Task progress | 77/88 complete (87.5%) |
-| Feature scope | Phases 1-8 complete |
-| Release gate | Phase 9 automated testing |
+| Plan status | MVP complete; security remediation in progress |
+| Phase progress | 9/9 MVP complete (100%) |
+| Feature scope | MVP + spec Phase-2 features complete |
+| Release gate | **Security audit remediation** before real employee data |
+
+## Security remediation (audit 2026-06-22)
+
+Audit found 5 High + 5 Medium + 2 Low. Remediation landed migrations 009–014 + auth config +
+step-up reauth + scoped self-delete RPC (service-role removed from runtime) + CSP/security headers +
+audit trail. All High/Medium fixes verified live against local Supabase (75 tests green; attack matrix 10/10). **Not "production-ready"**
+until the hosted-config residuals (dashboard signup/MFA/leaked-password, TLS/HSTS, backups/PITR) are
+owner-verified — see `plans/reports/security-remediation-260622-2213-rls-auth-service-role.md`.
 
 ## MVP milestones
 

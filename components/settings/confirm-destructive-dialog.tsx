@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-// Mounted only while active (parent conditionally renders it) → showModal once on mount,
-// no setState in the effect. Type-to-confirm gates the irreversible action.
+// Mounted only while active (parent conditionally renders it) → showModal once on mount, no setState
+// in the effect. Type-to-confirm gates the irreversible action; the server then enforces a recent
+// re-authentication (audit H4 step-up) — handled by the parent's needsReauth flow.
 export function ConfirmDestructiveDialog({
   title,
   message,

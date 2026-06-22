@@ -16,7 +16,28 @@ worker in MVP. All sensitive data scoped per user via Row-Level Security.
 | PWA | `app/manifest.ts` | Installable; no offline/SW in MVP |
 | Data access | Supabase JS via `@supabase/ssr` | Browser + server clients (Phase 3) |
 | Writes | Next.js Server Actions | Never write from Server Components |
-| Backend | Supabase Postgres + Auth | RLS `FOR ALL` on every table by `user_id` |
+| Backend | Supabase Postgres + Auth | RLS per-table by `user_id`, `TO authenticated` |
+
+## Security model (hardened — see `plans/reports/security-audit-260622-*`)
+
+- **RLS** on all 7 tables, scoped `TO authenticated`. Most tables use one `FOR ALL` owner policy;
+  `entries` is split into **SELECT / INSERT / DELETE** (no UPDATE) to keep evidence append-only.
+- **Append-only `entries`** enforced in the DB, not the UI: UPDATE revoked at grant + policy level;
+  INSERT is column-scoped so `id` / `user_id` / `created_at` fall back to server-controlled defaults.
+- **Cross-owner integrity:** a composite FK `entries(sentiment_id, user_id) → sentiment_options(id, user_id)`
+  (plus migration-008 triggers for employee/tag) guarantees every reference is same-owner.
+- **Destructive actions** (delete-all, delete-account) require **server-side password step-up**; a
+  valid session alone is insufficient. Account deletion runs through the scoped
+  `delete_own_account()` SECURITY DEFINER RPC — **no service-role key in the app runtime**.
+- **Browser headers:** CSP in `proxy`/middleware (`frame-ancestors 'none'`, `object-src 'none'`,
+  `base-uri`/`form-action 'self'`, Supabase-scoped `connect-src`; `script-src 'unsafe-inline'` —
+  Next-static-compatible, a nonce CSP would need app-wide dynamic rendering, deferred) + HSTS (prod)
+  + X-Frame-Options + nosniff + `Referrer-Policy: strict-origin-when-cross-origin` (NOT no-referrer,
+  which breaks Server Action CSRF) + Permissions-Policy. Auth cookies `Secure` over HTTPS.
+- **Audit trail:** append-only `security_events` (export / delete_all / reauth_failure) via a
+  SECURITY DEFINER logger; login failures + delete_account to server stderr. Never logs tokens/PII.
+- **Auth strength:** public signup OFF; min password 12 + composition; TOTP enrolment enabled
+  (AAL2 hard-gate + enrolment UI are follow-up).
 
 ## Core data model (see spec §4)
 

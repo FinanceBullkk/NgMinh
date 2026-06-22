@@ -9,7 +9,14 @@ type LocalConfig = {
   apiUrl: string;
   anonKey: string;
   serviceRoleKey: string;
+  jwtSecret: string;
 };
+
+// Local stack config (api url + keys + jwt secret) for tests that forge/expire tokens.
+export function localTestConfig(): { apiUrl: string; anonKey: string; jwtSecret: string } {
+  const c = localConfig();
+  return { apiUrl: c.apiUrl, anonKey: c.anonKey, jwtSecret: c.jwtSecret };
+}
 
 export type TestUser = {
   id: string;
@@ -42,10 +49,11 @@ function localConfig(): LocalConfig {
   const apiUrl = values.get("API_URL");
   const anonKey = values.get("PUBLISHABLE_KEY") ?? values.get("ANON_KEY");
   const serviceRoleKey = values.get("SERVICE_ROLE_KEY");
-  if (!apiUrl || !anonKey || !serviceRoleKey) {
+  const jwtSecret = values.get("JWT_SECRET");
+  if (!apiUrl || !anonKey || !serviceRoleKey || !jwtSecret) {
     throw new Error("Local Supabase is unavailable or returned incomplete credentials");
   }
-  cachedConfig = { apiUrl, anonKey, serviceRoleKey };
+  cachedConfig = { apiUrl, anonKey, serviceRoleKey, jwtSecret };
   return cachedConfig;
 }
 

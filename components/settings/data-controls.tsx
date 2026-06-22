@@ -2,20 +2,23 @@
 
 import { useState, useTransition } from "react";
 import { deleteAllData, deleteAccount } from "@/app/(app)/actions/data";
+import { startGoogleSignIn } from "@/lib/auth/oauth-client";
 import { ConfirmDestructiveDialog } from "./confirm-destructive-dialog";
 
-// DataControls: "Dữ liệu" section with two-row card layout per spec.
-// Row 1: Export JSON (neutral action).
-// Row 2: Delete account (destructive, red, opens confirm dialog).
-// Uses existing ConfirmDestructiveDialog — NOT window.confirm for destructive ops.
+// DataControls: "Dữ liệu" section. Export JSON (neutral) + Delete account (destructive, red,
+// opens confirm dialog). Destructive actions are step-up gated server-side (audit H4): if the
+// session is not freshly authenticated, the action returns needsReauth and we prompt a fresh
+// Google login before retry.
 export function DataControls() {
   const [confirm, setConfirm] = useState<null | "all" | "account">(null);
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState("");
+  const [needsReauth, setNeedsReauth] = useState(false);
 
   const doDeleteAll = () =>
     start(async () => {
       const res = await deleteAllData();
+      if (res?.needsReauth) return (setConfirm(null), setNeedsReauth(true));
       if (res?.error) return setMsg(res.error);
       setMsg("Đã xoá toàn bộ dữ liệu nhân viên.");
       setConfirm(null);
@@ -24,6 +27,7 @@ export function DataControls() {
   const doDeleteAccount = () =>
     start(async () => {
       const res = await deleteAccount(); // success → redirect to /login
+      if (res?.needsReauth) return (setConfirm(null), setNeedsReauth(true));
       if (res?.error) setMsg(res.error);
     });
 
@@ -38,6 +42,21 @@ export function DataControls() {
       </div>
 
       {msg && <p className="text-sm text-zinc-600">{msg}</p>}
+
+      {needsReauth && (
+        <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3">
+          <p className="text-sm text-amber-800">
+            Vì an toàn, hãy đăng nhập lại để xác nhận thao tác xoá, rồi thử lại.
+          </p>
+          <button
+            type="button"
+            onClick={() => startGoogleSignIn({ reauth: true, next: "/settings" })}
+            className="self-start rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+          >
+            Đăng nhập lại với Google
+          </button>
+        </div>
+      )}
 
       {/* White card: two rows divided by a separator */}
       <div className="overflow-hidden rounded-[14px] border border-[#e4e4e7] bg-white divide-y divide-[#e4e4e7]">
