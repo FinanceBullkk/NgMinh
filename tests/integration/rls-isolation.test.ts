@@ -62,6 +62,12 @@ describe("RLS isolation", () => {
     ]);
 
     expect(graphA.employee.user_id).toBe(context.userA.id);
-    for (const result of results) expect(result.error?.code).toBe("42501");
+    // Spoof must be rejected on every table. RLS WITH CHECK raises 42501; on the FK tables
+    // (entries/goals/employee_tags) the cross-owner guard (migration 008) fires first and
+    // raises 23514 (check_violation). Either is a correct rejection.
+    for (const result of results) {
+      expect(result.error).not.toBeNull();
+      expect(["42501", "23514"]).toContain(result.error?.code);
+    }
   });
 });

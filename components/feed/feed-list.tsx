@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { EntryType, FeedEntry, Tag } from "@/lib/types/models";
 import { groupByDay } from "@/lib/utils/day-grouping";
+import { mergeFeedPages } from "@/lib/utils/feed-merge";
 import { fetchFeedPage, fetchFeedFiltered } from "@/lib/data/feed-client";
 import { FeedDayGroup } from "./feed-day-group";
 import { FeedFilters } from "./feed-filters";
@@ -24,17 +25,7 @@ export function FeedList({
   // without re-mounting); "older" holds pages fetched via load-more.
   const [older, setOlder] = useState<FeedEntry[]>([]);
   const [exhausted, setExhausted] = useState(initialEntries.length < pageSize);
-  const items = useMemo(() => {
-    const seen = new Set<string>();
-    const out: FeedEntry[] = [];
-    for (const e of [...initialEntries, ...older]) {
-      if (!seen.has(e.id)) {
-        seen.add(e.id);
-        out.push(e);
-      }
-    }
-    return out;
-  }, [initialEntries, older]);
+  const items = useMemo(() => mergeFeedPages(initialEntries, older), [initialEntries, older]);
   const [person, setPerson] = useState("");
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [selectedTypes, setSelectedTypes] = useState<Set<EntryType>>(new Set());

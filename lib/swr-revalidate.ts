@@ -1,19 +1,12 @@
 "use client";
 
 import { mutate } from "swr";
+import { keyMatcher } from "@/lib/utils/cache-keys";
 import type { FeedBootstrap } from "@/lib/data/feed-client";
 import type { FeedEntry } from "@/lib/types/models";
 
 // Single source of truth for "which SWR caches does write X affect".
 // Cache keys in use: "roster" · "feed-bootstrap" · "settings" · "profile:<id>".
-// A key ending in ":*" matches every key with that prefix (e.g. "profile:*").
-export function keyMatcher(...keys: string[]) {
-  const exact = new Set(keys.filter((k) => !k.endsWith(":*")));
-  const prefixes = keys.filter((k) => k.endsWith(":*")).map((k) => k.slice(0, -1));
-  return (key: unknown): boolean =>
-    typeof key === "string" &&
-    (exact.has(key) || prefixes.some((p) => key.startsWith(p)));
-}
 
 // Each write calls exactly one of these. Adding a new write? Pick the matching invalidator
 // (or add one here) — never sprinkle mutate() calls across components again.
