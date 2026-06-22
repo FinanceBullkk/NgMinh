@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { createGoal } from "@/app/(app)/actions/goals";
 import type { Goal, GoalStatus } from "@/lib/types/models";
 import { GoalItem } from "./goal-item";
-import { revalidateKey } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/swr-revalidate";
 
 export function GoalsSection({
   employeeId,
@@ -17,6 +17,14 @@ export function GoalsSection({
   const [content, setContent] = useState("");
   const [pending, start] = useTransition();
 
+  // Sync with fresh SWR data: when the prop changes (background revalidate after a write),
+  // adopt it instead of staying frozen at mount (the bug class that bit feed-list).
+  const [prevInitial, setPrevInitial] = useState(initial);
+  if (prevInitial !== initial) {
+    setPrevInitial(initial);
+    setGoals(initial);
+  }
+
   const add = () => {
     const c = content.trim();
     if (!c) return;
@@ -26,7 +34,7 @@ export function GoalsSection({
         setGoals((prev) => [res.goal, ...prev]);
         setContent("");
         // Revalidate profile SWR cache so ReviewPack + any goal-derived data refreshes.
-        void revalidateKey(`profile:${employeeId}`);
+        void invalidate.goal(employeeId);
       }
     });
   };

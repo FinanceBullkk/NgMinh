@@ -100,11 +100,13 @@ export async function listEmployeesWithMeta(): Promise<EmployeeCard[]> {
 export async function searchEmployeeIdsByContent(q: string): Promise<string[]> {
   const term = q.trim();
   if (!term) return [];
+  // Escape LIKE metacharacters so a literal % / _ / \ matches itself, not as a wildcard.
+  const esc = term.replace(/[\\%_]/g, (m) => `\\${m}`);
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("entries")
     .select("employee_id")
-    .ilike("content", `%${term}%`);
+    .ilike("content", `%${esc}%`);
   if (error) throw error;
   return [...new Set((data ?? []).map((r) => r.employee_id))];
 }

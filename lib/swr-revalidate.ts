@@ -4,31 +4,42 @@ import { mutate } from "swr";
 import type { FeedBootstrap } from "@/lib/data/feed-client";
 import type { FeedEntry } from "@/lib/types/models";
 
+// Single source of truth for "which SWR caches does write X affect".
+// Cache keys in use: "roster" · "feed-bootstrap" · "settings" · "profile:<id>".
+// A key ending in ":*" matches every key with that prefix (e.g. "profile:*").
+export function keyMatcher(...keys: string[]) {
+  const exact = new Set(keys.filter((k) => !k.endsWith(":*")));
+  const prefixes = keys.filter((k) => k.endsWith(":*")).map((k) => k.slice(0, -1));
+  return (key: unknown): boolean =>
+    typeof key === "string" &&
+    (exact.has(key) || prefixes.some((p) => key.startsWith(p)));
+}
+
+// Each write calls exactly one of these. Adding a new write? Pick the matching invalidator
+// (or add one here) — never sprinkle mutate() calls across components again.
+export const invalidate = {
+  // A note created/deleted → Feed list + Roster (sparkline/nudges) + any open Profile timeline.
+  entry: () => mutate(keyMatcher("feed-bootstrap", "roster", "profile:*")),
+  // Sentiment label/color/weight ripple into Feed rows, Roster sparkline, Profile timeline,
+  // and the Settings list itself.
+  sentiment: () => mutate(keyMatcher("settings", "feed-bootstrap", "roster", "profile:*")),
+  // Tags: Settings list + Roster chips/filter + Profile tags.
+  tag: () => mutate(keyMatcher("settings", "roster", "profile:*")),
+  // Employee add/edit/delete → Roster + Feed (name/cascade) + that Profile (default: all).
+  employee: (id?: string) =>
+    mutate(keyMatcher("roster", "feed-bootstrap", id ? `profile:${id}` : "profile:*")),
+  // current_take / closeness show on the Roster card and the Profile.
+  takeOrCloseness: (id: string) => mutate(keyMatcher("roster", `profile:${id}`)),
+  // Goals show only on the Profile.
+  goal: (id: string) => mutate(keyMatcher(`profile:${id}`)),
+};
+
 // Optimistic: drop a just-created entry into the Feed cache immediately so it shows without
-// waiting for a refetch. The follow-up revalidate reconciles it with the real row.
+// waiting for a refetch. The follow-up invalidate.entry() reconciles with the real row.
 export function prependEntryToFeed(entry: FeedEntry) {
   return mutate(
     "feed-bootstrap",
     (cur?: FeedBootstrap) => (cur ? { ...cur, entries: [entry, ...cur.entries] } : cur),
     { revalidate: false },
   );
-}
-
-// SWR cache keys used by the client-rendered pages:
-//   "roster" · "feed-bootstrap" · "settings" · "profile:<id>"
-// After a write (Server Action) resolves, the calling client component revalidates the
-// affected caches so the UI updates without a full reload.
-
-// An entry was created/deleted → affects Feed, Roster (sparkline/nudges) and any Profile.
-export function revalidateAfterEntryWrite() {
-  return mutate(
-    (key) =>
-      typeof key === "string" &&
-      (key === "roster" || key === "feed-bootstrap" || key.startsWith("profile:")),
-  );
-}
-
-// Revalidate a single named cache (e.g. after editing tags/sentiments/employees).
-export function revalidateKey(key: string) {
-  return mutate(key);
 }

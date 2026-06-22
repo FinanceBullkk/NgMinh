@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { createTag, deleteTag } from "@/app/(app)/actions/tags";
 import type { Tag } from "@/lib/types/models";
-import { revalidateKey } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/swr-revalidate";
 
 // TagManager: chip-style tag list + inline add input.
 // Spec: card with existing tags as chips (each with ✕ remove), input "Tên tag mới…" + dark "Thêm" button.
@@ -14,6 +14,13 @@ export function TagManager({ initial }: { initial: Tag[] }) {
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
   const [newName, setNewName] = useState("");
+
+  // Adopt fresh SWR data on background revalidate instead of staying frozen at mount.
+  const [prevInitial, setPrevInitial] = useState(initial);
+  if (prevInitial !== initial) {
+    setPrevInitial(initial);
+    setTags(initial);
+  }
 
   const onAdd = () => {
     const name = newName.trim();
@@ -28,7 +35,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
       });
       setNewName("");
       setError("");
-      revalidateKey("settings");
+      invalidate.tag();
     });
   };
 
@@ -39,7 +46,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
       if (res.error) return setError(res.error);
       setTags((prev) => prev.filter((t) => t.id !== id));
       setError("");
-      revalidateKey("settings");
+      invalidate.tag();
     });
   };
 

@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { updateGoalStatus } from "@/app/(app)/actions/goals";
 import type { Goal, GoalStatus } from "@/lib/types/models";
-import { revalidateKey } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/swr-revalidate";
 
 export function GoalItem({
   goal,
@@ -21,7 +21,7 @@ export function GoalItem({
       const res = await updateGoalStatus(goal.id, s);
       if (!res.error) {
         onStatusChange(s);
-        void revalidateKey(`profile:${employeeId}`);
+        void invalidate.goal(employeeId);
       }
     });
 

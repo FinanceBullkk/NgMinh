@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { updateCloseness } from "@/app/(app)/actions/employees";
 import { closenessLabel } from "@/lib/utils/closeness";
-import { revalidateKey } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/swr-revalidate";
 
 // variant="slider" (default): full-width range slider used in the mobile header.
 // variant="pips":  compact pip row used in the desktop header right column.
@@ -22,7 +22,7 @@ export function ClosenessSlider({
   const save = (v: number) =>
     start(async () => {
       await updateCloseness(employeeId, v);
-      void revalidateKey(`profile:${employeeId}`);
+      void invalidate.takeOrCloseness(employeeId);
     });
 
   if (variant === "pips") {

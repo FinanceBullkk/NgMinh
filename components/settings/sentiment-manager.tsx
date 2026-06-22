@@ -9,7 +9,7 @@ import {
   archiveSentiment,
   unarchiveSentiment,
 } from "@/app/(app)/actions/sentiment";
-import { revalidateKey } from "@/lib/swr-revalidate";
+import { invalidate } from "@/lib/swr-revalidate";
 import { SentimentRow } from "./sentiment-row";
 import { SentimentForm } from "./sentiment-form";
 
@@ -43,6 +43,13 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
 
+  // Adopt fresh SWR data on background revalidate instead of staying frozen at mount.
+  const [prevInitial, setPrevInitial] = useState(initial);
+  if (prevInitial !== initial) {
+    setPrevInitial(initial);
+    setItems(initial);
+  }
+
   const active = items
     .filter((s) => !s.is_archived)
     .sort((a, b) => a.order_index - b.order_index);
@@ -54,7 +61,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
       if ("error" in res) return setError(res.error);
       setItems((p) => [...p, res.option]);
       setError("");
-      revalidateKey("settings");
+      invalidate.sentiment();
     });
 
   const onUpdate = (id: string, label: string, color: string, weight: number) =>
@@ -65,7 +72,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
         p.map((s) => (s.id === id ? { ...s, label, color, weight } : s)),
       );
       setError("");
-      revalidateKey("settings");
+      invalidate.sentiment();
     });
 
   const onArchive = (id: string) =>
@@ -76,7 +83,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
         p.map((s) => (s.id === id ? { ...s, is_archived: true } : s)),
       );
       setError("");
-      revalidateKey("settings");
+      invalidate.sentiment();
     });
 
   const onUnarchive = (id: string) =>
@@ -87,7 +94,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
         p.map((s) => (s.id === id ? { ...s, is_archived: false } : s)),
       );
       setError("");
-      revalidateKey("settings");
+      invalidate.sentiment();
     });
 
   // Up/down reorder — keep working without UI arrows (data integrity preserved).
@@ -107,7 +114,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
     start(async () => {
       const res = await reorderSentiment(ids);
       if (res.error) setError(res.error);
-      else revalidateKey("settings");
+      else invalidate.sentiment();
     });
   };
 

@@ -108,7 +108,7 @@ export function FeedList({
 
   const loadMore = () =>
     start(async () => {
-      const more = await fetchFeedPage(items.length, pageSize);
+      const more = await fetchFeedPage(pageSize, items.length); // (limit, offset)
       setOlder((prev) => [...prev, ...more]);
       if (more.length < pageSize) setExhausted(true);
     });

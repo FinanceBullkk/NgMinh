@@ -5,12 +5,12 @@
 import { createClient } from "@/lib/supabase/client";
 import { buildSentimentColorSeries } from "@/lib/utils/sparkline-points";
 import { computeNudges } from "@/lib/utils/nudges";
+import { todayInSaigon } from "@/lib/utils/today";
 import type { EmployeeCard, SentimentOption, Tag } from "@/lib/types/models";
 
-// Today's date in Asia/Saigon time zone (YYYY-MM-DD).
-function todayInSaigon(): string {
-  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Saigon" });
-}
+// Cap the roster entries fetch to a recent window so it stays bounded over the notebook's
+// lifetime — sparkline uses the last ~20 and nudges look at recent weeks, so a year is ample.
+const ROSTER_ENTRY_WINDOW_DAYS = 365;
 
 export type RosterBootstrap = {
   cards: EmployeeCard[];
@@ -25,6 +25,8 @@ export type RosterBootstrap = {
 export async function fetchRoster(): Promise<RosterBootstrap> {
   const supabase = createClient();
   const today = todayInSaigon();
+  const cutoff = new Date(Date.now() - ROSTER_ENTRY_WINDOW_DAYS * 86_400_000)
+    .toLocaleDateString("en-CA", { timeZone: "Asia/Saigon" });
 
   const [empsRes, linksRes, tagsRes, entriesRes, sentsRes, todayRes] =
     await Promise.all([
@@ -34,6 +36,7 @@ export async function fetchRoster(): Promise<RosterBootstrap> {
       supabase
         .from("entries")
         .select("employee_id, sentiment_id, entry_date, created_at, type")
+        .gte("entry_date", cutoff)
         .order("entry_date", { ascending: true })
         .order("created_at", { ascending: true }),
       // Include all sentiment options (incl. archived) so sparkline renders historical colors.

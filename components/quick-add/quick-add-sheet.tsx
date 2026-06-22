@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { fetchQuickAddData } from "@/lib/data/quick-add-client";
-import { revalidateAfterEntryWrite, prependEntryToFeed } from "@/lib/swr-revalidate";
+import { invalidate, prependEntryToFeed } from "@/lib/swr-revalidate";
 import { createClient } from "@/lib/supabase/client";
+import { todayInSaigon } from "@/lib/utils/today";
 import type { EntryType, FeedEntry, SentimentOption } from "@/lib/types/models";
 import { TypeButtonRow } from "./type-button-row";
 import { SentimentButtonRow } from "./sentiment-button-row";
 
-const todayISO = () => new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD, local
+const todayISO = () => todayInSaigon(); // YYYY-MM-DD in Asia/Saigon (matches reads/nudges)
 
 // Quick-add as a bottom sheet (mobile-first). On Profile: pass employeeId (preselected).
 // Elsewhere: pass employees for a chip picker. `renderTrigger` lets a caller (e.g. the nav
@@ -103,7 +104,7 @@ export function QuickAdd({
     // Show the new note immediately in the Feed cache, then write it directly to Supabase
     // (browser→DB, fast) and reconcile. No slow server-action round-trip on the hot path.
     const optimistic: FeedEntry = {
-      id: `tmp-${entryDate}-${text.length}`,
+      id: `tmp-${crypto.randomUUID()}`,
       user_id: "",
       employee_id: targetId,
       entry_date: entryDate,
@@ -125,10 +126,10 @@ export function QuickAdd({
         sentiment_id: sentimentId,
       });
       if (insErr) {
-        void revalidateAfterEntryWrite(); // roll the optimistic entry back
+        void invalidate.entry(); // roll the optimistic entry back
         return setError(insErr.message);
       }
-      void revalidateAfterEntryWrite(); // reconcile feed/roster/profile with the real row
+      void invalidate.entry(); // reconcile feed/roster/profile with the real row
       if (again) {
         setContent("");
         setSentimentId(null);
