@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { EntryType, FeedEntry, Tag } from "@/lib/types/models";
 import { groupByDay } from "@/lib/utils/day-grouping";
-import { loadMoreFeed, filterFeed } from "@/app/(app)/actions/entries";
+import { fetchFeedPage, fetchFeedFiltered } from "@/lib/data/feed-client";
 import { FeedDayGroup } from "./feed-day-group";
 import { FeedFilters } from "./feed-filters";
 
@@ -64,7 +64,7 @@ export function FeedList({
     if (!filtering) return;
     const key = filterKey;
     startFilter(async () => {
-      const res = await filterFeed({
+      const res = await fetchFeedFiltered({
         employeeId: person || null,
         types: [...selectedTypes],
         employeeIds: tagEmployeeIds,
@@ -95,7 +95,7 @@ export function FeedList({
 
   const loadMore = () =>
     start(async () => {
-      const more = await loadMoreFeed(items.length, pageSize);
+      const more = await fetchFeedPage(items.length, pageSize);
       setItems((prev) => [...prev, ...more]);
       if (more.length < pageSize) setExhausted(true);
     });
