@@ -53,7 +53,8 @@ export function TagManager({ initial }: { initial: Tag[] }) {
       <div className="flex flex-col gap-0.5">
         <h2 className="text-[15px] font-bold">Tags</h2>
         <p className="text-sm text-zinc-500">
-          Dùng để gắn nhãn và lọc nhân viên trong Roster.
+          Tạo tag ở đây → gắn cho nhân viên ở trang Profile (hoặc ⋯ → Sửa thông tin trên
+          Roster) → lọc Roster theo tag.
         </p>
       </div>
 

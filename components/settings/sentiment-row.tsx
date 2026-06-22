@@ -15,11 +15,11 @@ const PRESET_COLORS = [
   "#4f8a8b", // teal
 ];
 
-// Polarity segment config: each maps to weight value -1 / 0 / +1.
+// Polarity (weight) segments — word labels so the meaning is obvious (was − / 0 / +).
 const POLARITY_SEGMENTS = [
-  { label: "−", value: -1, activeColor: "#c45b4c" },
-  { label: "0", value: 0, activeColor: "#9aa0a6" },
-  { label: "+", value: 1, activeColor: "#3f8f6b" },
+  { label: "Tiêu cực", value: -1, activeColor: "#c45b4c" },
+  { label: "Trung tính", value: 0, activeColor: "#9aa0a6" },
+  { label: "Tích cực", value: 1, activeColor: "#3f8f6b" },
 ] as const;
 
 // ColorSwatchPopover: shows a 26×26px swatch button; click opens a 2×4 grid palette.
@@ -116,7 +116,7 @@ function PolarityControl({
             onClick={() => onChange(seg.value)}
             aria-pressed={isActive}
             className={[
-              "w-8 py-1 text-xs font-semibold transition-colors disabled:opacity-50",
+              "px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap transition-colors disabled:opacity-50",
               i > 0 ? "border-l border-zinc-300" : "",
             ].join(" ")}
             style={
@@ -221,7 +221,7 @@ export function SentimentRow({
   };
 
   return (
-    <li className="flex items-center gap-2 px-3 py-2">
+    <li className="flex flex-wrap items-center gap-2 px-3 py-2">
       {/* Color swatch → popover palette */}
       <ColorSwatchPopover
         color={color}
@@ -235,7 +235,7 @@ export function SentimentRow({
         onChange={(e) => setLabel(e.target.value)}
         onBlur={handleLabelBlur}
         aria-label="Tên cảm nhận"
-        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:underline"
+        className="min-w-[110px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:underline"
       />
 
       {/* 3-segment polarity control */}

@@ -115,7 +115,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
     <section className="flex flex-col gap-3">
       <SectionHeader
         title="Mức cảm nhận"
-        description="Tự định nghĩa thang cảm nhận của bạn. Màu chính là màu chấm trên sparkline. Độ phân cực dùng để phát hiện 'đang nguội'."
+        description="Mỗi mức có một nhãn + màu (màu chấm trên sparkline). Đánh dấu nó là Tiêu cực / Trung tính / Tích cực để app biết ai 'đang nguội' (gần đây toàn tiêu cực). 3 mức mặc định đã đặt đúng — thường không cần đổi."
       />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
