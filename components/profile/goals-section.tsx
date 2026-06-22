@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useSyncedState } from "@/lib/hooks/use-synced-state";
 import { createGoal } from "@/app/(app)/actions/goals";
 import type { Goal, GoalStatus } from "@/lib/types/models";
 import { GoalItem } from "./goal-item";
@@ -13,17 +14,9 @@ export function GoalsSection({
   employeeId: string;
   goals: Goal[];
 }) {
-  const [goals, setGoals] = useState<Goal[]>(initial);
+  const [goals, setGoals] = useSyncedState<Goal[]>(initial);
   const [content, setContent] = useState("");
   const [pending, start] = useTransition();
-
-  // Sync with fresh SWR data: when the prop changes (background revalidate after a write),
-  // adopt it instead of staying frozen at mount (the bug class that bit feed-list).
-  const [prevInitial, setPrevInitial] = useState(initial);
-  if (prevInitial !== initial) {
-    setPrevInitial(initial);
-    setGoals(initial);
-  }
 
   const add = () => {
     const c = content.trim();

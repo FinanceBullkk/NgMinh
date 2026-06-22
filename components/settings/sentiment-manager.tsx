@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useSyncedState } from "@/lib/hooks/use-synced-state";
 import type { SentimentOption } from "@/lib/types/models";
 import {
   createSentiment,
@@ -39,16 +40,9 @@ function Card({ children }: { children: React.ReactNode }) {
 }
 
 export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
-  const [items, setItems] = useState<SentimentOption[]>(initial);
+  const [items, setItems] = useSyncedState<SentimentOption[]>(initial);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
-
-  // Adopt fresh SWR data on background revalidate instead of staying frozen at mount.
-  const [prevInitial, setPrevInitial] = useState(initial);
-  if (prevInitial !== initial) {
-    setPrevInitial(initial);
-    setItems(initial);
-  }
 
   const active = items
     .filter((s) => !s.is_archived)

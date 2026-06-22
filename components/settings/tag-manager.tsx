@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useSyncedState } from "@/lib/hooks/use-synced-state";
 import { createTag, deleteTag } from "@/app/(app)/actions/tags";
 import type { Tag } from "@/lib/types/models";
 import { invalidate } from "@/lib/cache";
@@ -10,17 +11,10 @@ import { invalidate } from "@/lib/cache";
 // Note: rename is kept in the data layer but removed from this UI per the new spec design
 // (chips don't have an edit mode; users delete + re-add to rename).
 export function TagManager({ initial }: { initial: Tag[] }) {
-  const [tags, setTags] = useState<Tag[]>(initial);
+  const [tags, setTags] = useSyncedState<Tag[]>(initial);
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
   const [newName, setNewName] = useState("");
-
-  // Adopt fresh SWR data on background revalidate instead of staying frozen at mount.
-  const [prevInitial, setPrevInitial] = useState(initial);
-  if (prevInitial !== initial) {
-    setPrevInitial(initial);
-    setTags(initial);
-  }
 
   const onAdd = () => {
     const name = newName.trim();
