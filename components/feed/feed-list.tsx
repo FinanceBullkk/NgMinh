@@ -20,8 +20,21 @@ export function FeedList({
   tags: Tag[];
   tagsByEmployee: Record<string, string[]>;
 }) {
-  const [items, setItems] = useState<FeedEntry[]>(initialEntries);
+  // First page comes LIVE from the SWR prop (so a new/changed note shows immediately,
+  // without re-mounting); "older" holds pages fetched via load-more.
+  const [older, setOlder] = useState<FeedEntry[]>([]);
   const [exhausted, setExhausted] = useState(initialEntries.length < pageSize);
+  const items = useMemo(() => {
+    const seen = new Set<string>();
+    const out: FeedEntry[] = [];
+    for (const e of [...initialEntries, ...older]) {
+      if (!seen.has(e.id)) {
+        seen.add(e.id);
+        out.push(e);
+      }
+    }
+    return out;
+  }, [initialEntries, older]);
   const [person, setPerson] = useState("");
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [selectedTypes, setSelectedTypes] = useState<Set<EntryType>>(new Set());
@@ -96,7 +109,7 @@ export function FeedList({
   const loadMore = () =>
     start(async () => {
       const more = await fetchFeedPage(items.length, pageSize);
-      setItems((prev) => [...prev, ...more]);
+      setOlder((prev) => [...prev, ...more]);
       if (more.length < pageSize) setExhausted(true);
     });
 
