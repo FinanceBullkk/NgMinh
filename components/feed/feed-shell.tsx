@@ -61,7 +61,7 @@ export function FeedShell({ bootstrap }: { bootstrap: FeedBootstrap }) {
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
           <h1 className="text-2xl font-semibold tracking-tight lg:text-[25px]">Feed</h1>
-          <span className="hidden text-sm text-zinc-400 lg:inline">toàn đội, theo thời gian</span>
+          <span className="hidden text-sm text-zinc-400 lg:inline">whole team, over time</span>
         </div>
         <ViewToggle view={view} onChange={setView} />
       </div>

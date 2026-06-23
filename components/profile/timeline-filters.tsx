@@ -3,7 +3,7 @@
 import { ENTRY_TYPES } from "@/lib/constants/entry-types";
 import type { EntryType } from "@/lib/types/models";
 
-// Timeline filter as chips (Profile mock #6): one tap to view only Win / Lo ngại when
+// Timeline filter as chips (Profile mock #6): one tap to view only Win / Concern when
 // writing a review. "" = all types.
 export function TimelineFilters({
   type,
@@ -20,7 +20,7 @@ export function TimelineFilters({
   return (
     <div className="flex flex-wrap gap-1.5">
       <button onClick={() => onType("")} aria-pressed={!type} className={chip(!type)}>
-        Tất cả
+        All
       </button>
       {ENTRY_TYPES.map((t) => (
         <button

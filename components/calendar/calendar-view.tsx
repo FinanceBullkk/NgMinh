@@ -90,7 +90,7 @@ export function CalendarView({
   }, [sheetOpen]);
 
   if (error) {
-    return <p className="py-12 text-center text-sm text-red-600">Không tải được lịch. Thử tải lại trang.</p>;
+    return <p className="py-12 text-center text-sm text-red-600">Couldn’t load the calendar. Try reloading the page.</p>;
   }
 
   return (
@@ -106,7 +106,7 @@ export function CalendarView({
         </div>
         {data && filter.filtering && byDay.size === 0 && (
           <p className="pt-4 text-center text-sm text-zinc-500">
-            Không có ghi chép nào khớp bộ lọc trong tháng này.
+            No entries match the filter this month.
           </p>
         )}
       </div>
@@ -123,7 +123,7 @@ export function CalendarView({
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Ghi chép trong ngày"
+            aria-label="Entries for the day"
             className="fixed inset-x-0 bottom-0 z-50 max-h-[80dvh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl"
           >
             <div className="mx-auto mb-2 h-1.5 w-9 rounded-full bg-zinc-300" aria-hidden />

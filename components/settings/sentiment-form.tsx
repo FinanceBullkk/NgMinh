@@ -24,7 +24,7 @@ function PlusIcon() {
   );
 }
 
-// SentimentForm: "+ Thêm mức cảm nhận" row that expands into label + submit.
+// SentimentForm: "+ Add sentiment" row that expands into label + submit.
 // Lives inside the sentiment card (border-t separates from the list above).
 // Polarity defaults to 0 (neutral) on create — user can edit after via inline row.
 export function SentimentForm({
@@ -63,7 +63,7 @@ export function SentimentForm({
         className="flex w-full items-center gap-2 px-3 py-2.5 text-sm text-zinc-400 transition-colors hover:text-zinc-600 disabled:opacity-50"
       >
         <PlusIcon />
-        Thêm mức cảm nhận
+        Add sentiment
       </button>
     );
   }
@@ -80,8 +80,8 @@ export function SentimentForm({
         value={label}
         onChange={(e) => setLabel(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Tên cảm nhận mới…"
-        aria-label="Tên cảm nhận mới"
+        placeholder="New sentiment name…"
+        aria-label="New sentiment name"
         className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
       />
       <button
@@ -90,7 +90,7 @@ export function SentimentForm({
         onClick={handleSubmit}
         className="shrink-0 rounded-md bg-zinc-800 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
       >
-        Thêm
+        Add
       </button>
       <button
         type="button"
@@ -100,7 +100,7 @@ export function SentimentForm({
         }}
         className="shrink-0 text-xs text-zinc-400 hover:text-zinc-600"
       >
-        Huỷ
+        Cancel
       </button>
     </div>
   );

@@ -17,7 +17,7 @@ export async function deleteEntry(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase.from("entries").delete().eq("id", entryId);
   if (error) return { error: error.message };

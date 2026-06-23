@@ -17,9 +17,9 @@ const PRESET_COLORS = [
 
 // Polarity (weight) segments — word labels so the meaning is obvious (was − / 0 / +).
 const POLARITY_SEGMENTS = [
-  { label: "Tiêu cực", value: -1, activeColor: "#c45b4c" },
-  { label: "Trung tính", value: 0, activeColor: "#9aa0a6" },
-  { label: "Tích cực", value: 1, activeColor: "#3f8f6b" },
+  { label: "Negative", value: -1, activeColor: "#c45b4c" },
+  { label: "Neutral", value: 0, activeColor: "#9aa0a6" },
+  { label: "Positive", value: 1, activeColor: "#3f8f6b" },
 ] as const;
 
 // ColorSwatchPopover: shows a 26×26px swatch button; click opens a 2×4 grid palette.
@@ -55,7 +55,7 @@ function ColorSwatchPopover({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        aria-label="Chọn màu"
+        aria-label="Choose color"
         className="h-[26px] w-[26px] rounded-lg border border-black/10 disabled:opacity-50"
         style={{ backgroundColor: color }}
       />
@@ -64,7 +64,7 @@ function ColorSwatchPopover({
         <div
           className="absolute left-0 top-8 z-20 grid grid-cols-4 gap-1.5 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg"
           role="dialog"
-          aria-label="Bảng màu"
+          aria-label="Color palette"
         >
           {PRESET_COLORS.map((c) => (
             <button
@@ -104,7 +104,7 @@ function PolarityControl({
     <div
       className="flex overflow-hidden rounded-lg border border-zinc-300"
       role="group"
-      aria-label="Độ phân cực"
+      aria-label="Polarity"
     >
       {POLARITY_SEGMENTS.map((seg, i) => {
         const isActive = weight === seg.value;
@@ -234,7 +234,7 @@ export function SentimentRow({
         value={label}
         onChange={(e) => setLabel(e.target.value)}
         onBlur={handleLabelBlur}
-        aria-label="Tên cảm nhận"
+        aria-label="Sentiment name"
         className="min-w-[110px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:underline"
       />
 
@@ -252,11 +252,11 @@ export function SentimentRow({
         onClick={() => onArchive(option.id)}
         title={
           canArchive
-            ? "Lưu trữ cảm nhận này"
-            : "Phải còn ít nhất 1 cảm nhận đang dùng"
+            ? "Archive this sentiment"
+            : "At least 1 sentiment must stay in use"
         }
         className="shrink-0 text-zinc-400 transition-colors hover:text-zinc-600 disabled:opacity-30"
-        aria-label="Lưu trữ"
+        aria-label="Archive"
       >
         <ArchiveIcon />
       </button>

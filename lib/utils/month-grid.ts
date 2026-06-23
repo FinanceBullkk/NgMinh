@@ -41,10 +41,14 @@ export function shiftMonth(month: string, delta: number): string {
   return new Date(Date.UTC(y, m - 1 + delta, 1)).toISOString().slice(0, 7);
 }
 
-// Vietnamese month heading, e.g. "Tháng 6 2026".
+// Month heading, e.g. "June 2026".
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 export function monthLabel(month: string): string {
   const { y, m } = parseMonth(month);
-  return `Tháng ${m} ${y}`;
+  return `${MONTH_NAMES[m - 1]} ${y}`;
 }
 
 // A stable 42-cell (6 weeks × 7 days) Monday-first matrix covering `month`, with leading days

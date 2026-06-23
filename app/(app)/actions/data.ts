@@ -13,12 +13,12 @@ export async function deleteAllData(): Promise<{ error?: string; ok?: boolean }>
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   try {
     await deletePeopleDataForClient(supabase);
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Không thể xoá dữ liệu." };
+    return { error: error instanceof Error ? error.message : "Could not delete data." };
   }
 
   revalidatePath("/");
@@ -33,7 +33,7 @@ export async function deleteAccount(): Promise<{ error?: string }> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.deleteUser(user.id);

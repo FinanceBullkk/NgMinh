@@ -2,7 +2,7 @@
 // statement (warming / stable / cooling) so the feature's payoff is self-evident. Pure & testable.
 //
 // LEVEL-based, and 'cool' uses the SAME window/threshold as nudges.ts cooling (avg polarity of the
-// most recent ≤window sentiment-bearing entries < 0) — so there is ONE notion of "đang nguội",
+// most recent ≤window sentiment-bearing entries < 0) — so there is ONE notion of "cooling",
 // not two. < min weighted entries → 'insufficient' (the UI invites the user to log more).
 
 export type SentimentTrend = "warm" | "stable" | "cool" | "insufficient";

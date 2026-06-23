@@ -27,7 +27,7 @@ export function AppNav() {
           renderTrigger={(open) => (
             <button
               onClick={open}
-              aria-label="Ghi nhanh"
+              aria-label="Quick add"
               className="absolute left-1/2 top-0 flex h-[60px] w-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-white bg-[#3f8f6b] text-white shadow-[0_8px_22px_rgba(63,143,107,0.45)]"
             >
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
@@ -78,7 +78,7 @@ function AccountTab() {
         style={{ color: open ? "#3f8f6b" : "#a1a1aa" }}
       >
         <AccountIcon />
-        <span className="text-[10.5px] font-semibold">Tài khoản</span>
+        <span className="text-[10.5px] font-semibold">Account</span>
       </button>
 
       {open && (
@@ -90,7 +90,7 @@ function AccountTab() {
                 type="submit"
                 className="whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
               >
-                Đăng xuất
+                Sign out
               </button>
             </form>
           </div>

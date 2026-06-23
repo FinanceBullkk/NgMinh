@@ -22,7 +22,7 @@ export function LoginForm() {
         />
       </label>
       <label className="flex flex-col gap-1 text-sm">
-        Mật khẩu
+        Password
         <input
           name="password"
           type="password"
@@ -43,7 +43,7 @@ export function LoginForm() {
         disabled={pending}
         className="rounded-md bg-[#3f8f6b] px-4 py-2 font-medium text-white disabled:opacity-60"
       >
-        {pending ? "Đang vào…" : "Đăng nhập"}
+        {pending ? "Signing in…" : "Sign in"}
       </button>
     </form>
   );

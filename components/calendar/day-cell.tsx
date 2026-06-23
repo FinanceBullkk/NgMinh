@@ -24,7 +24,7 @@ export function DayCell({
       type="button"
       onClick={() => onSelect(day.date)}
       aria-pressed={selected}
-      aria-label={`${day.date}${entries.length ? `, ${entries.length} ghi chép` : ", chưa có ghi chép"}`}
+      aria-label={`${day.date}${entries.length ? `, ${entries.length} entries` : ", no entries yet"}`}
       className={[
         "flex aspect-square flex-col items-center gap-1 rounded-lg p-1 transition-colors",
         day.inMonth ? "text-zinc-800" : "text-zinc-300",

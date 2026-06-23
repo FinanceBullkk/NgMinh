@@ -8,9 +8,9 @@ const STATES: Record<
   Exclude<SentimentTrend, "insufficient">,
   { label: string; bg: string; fg: string }
 > = {
-  warm: { label: "Gần đây tích cực ↑", bg: "#e8f5ef", fg: "#2c6b50" },
-  stable: { label: "Bình thường →", bg: "#f4f4f5", fg: "#52525b" },
-  cool: { label: "Đang nguội ↓", bg: "#fde8e6", fg: "#b3392c" },
+  warm: { label: "Recently positive ↑", bg: "#e8f5ef", fg: "#2c6b50" },
+  stable: { label: "Steady →", bg: "#f4f4f5", fg: "#52525b" },
+  cool: { label: "Cooling ↓", bg: "#fde8e6", fg: "#b3392c" },
 };
 
 export function SentimentTrendChip({
@@ -22,7 +22,7 @@ export function SentimentTrendChip({
 }) {
   if (trend === "insufficient") {
     return showInvite ? (
-      <span className="text-xs text-zinc-400">Ghi cảm nhận để thấy xu hướng</span>
+      <span className="text-xs text-zinc-400">Log sentiment to see the trend</span>
     ) : null;
   }
   const s = STATES[trend];

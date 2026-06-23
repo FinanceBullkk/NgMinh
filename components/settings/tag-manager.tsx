@@ -7,7 +7,7 @@ import type { Tag } from "@/lib/types/models";
 import { invalidate } from "@/lib/cache";
 
 // TagManager: chip-style tag list + inline add input.
-// Spec: card with existing tags as chips (each with ✕ remove), input "Tên tag mới…" + dark "Thêm" button.
+// Spec: card with existing tags as chips (each with ✕ remove), input "New tag name…" + dark "Add" button.
 // Note: rename is kept in the data layer but removed from this UI per the new spec design
 // (chips don't have an edit mode; users delete + re-add to rename).
 export function TagManager({ initial }: { initial: Tag[] }) {
@@ -34,7 +34,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
   };
 
   const onRemove = (id: string, name: string) => {
-    if (!window.confirm(`Xoá tag "${name}"? Sẽ gỡ khỏi mọi nhân viên.`)) return;
+    if (!window.confirm(`Delete tag "${name}"? It will be removed from all employees.`)) return;
     start(async () => {
       const res = await deleteTag(id);
       if (res.error) return setError(res.error);
@@ -54,8 +54,8 @@ export function TagManager({ initial }: { initial: Tag[] }) {
       <div className="flex flex-col gap-0.5">
         <h2 className="text-[15px] font-bold">Tags</h2>
         <p className="text-sm text-zinc-500">
-          Tạo tag ở đây → gắn cho nhân viên ở trang Profile (hoặc ⋯ → Sửa thông tin trên
-          Roster) → lọc Roster theo tag.
+          Create tags here → attach them to employees on the Profile page (or ⋯ → Edit info on
+          the Roster) → filter the Roster by tag.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
         {/* Chips area — wraps naturally */}
         <div className="flex flex-wrap gap-2 p-3">
           {tags.length === 0 && (
-            <span className="text-sm text-zinc-400">Chưa có tag.</span>
+            <span className="text-sm text-zinc-400">No tags yet.</span>
           )}
           {tags.map((t) => (
             <span
@@ -78,7 +78,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
                 type="button"
                 disabled={pending}
                 onClick={() => onRemove(t.id, t.name)}
-                aria-label={`Xoá tag ${t.name}`}
+                aria-label={`Delete tag ${t.name}`}
                 className="ml-0.5 text-zinc-400 transition-colors hover:text-zinc-700 disabled:opacity-40"
               >
                 ✕
@@ -93,8 +93,8 @@ export function TagManager({ initial }: { initial: Tag[] }) {
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Tên tag mới…"
-            aria-label="Tên tag mới"
+            placeholder="New tag name…"
+            aria-label="New tag name"
             disabled={pending}
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 disabled:opacity-50"
           />
@@ -104,7 +104,7 @@ export function TagManager({ initial }: { initial: Tag[] }) {
             onClick={onAdd}
             className="shrink-0 rounded-md bg-zinc-800 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
           >
-            Thêm
+            Add
           </button>
         </div>
       </div>

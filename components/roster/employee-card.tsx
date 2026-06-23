@@ -51,7 +51,7 @@ export function EmployeeCardView({
           {label}
         </span>
 
-        {/* ⋯ overflow menu — replaces inline Sửa / Xoá text buttons */}
+        {/* ⋯ overflow menu — replaces inline Edit / Delete text buttons */}
         <CardActionsMenu onEdit={onEdit} onDelete={onDelete} />
       </div>
 
@@ -62,7 +62,7 @@ export function EmployeeCardView({
             className="rounded-full px-2 py-0.5 text-xs font-medium"
             style={{ background: "#fcefcf", color: "#92660a" }}
           >
-            Lâu chưa 1:1
+            1:1 overdue
           </span>
         </div>
       )}

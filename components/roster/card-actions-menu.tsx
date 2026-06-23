@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // Small ⋯ overflow menu on each employee card.
-// Renders a button that toggles a positioned dropdown with "Sửa" and "Xoá" actions.
+// Renders a button that toggles a positioned dropdown with "Edit" and "Delete" actions.
 // Closes on outside click, Escape key, or action selection.
 export function CardActionsMenu({
   onEdit,
@@ -41,7 +41,7 @@ export function CardActionsMenu({
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Thao tác"
+        aria-label="Actions"
         aria-expanded={open}
         className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
       >
@@ -81,7 +81,7 @@ export function CardActionsMenu({
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
-            Sửa thông tin
+            Edit
           </button>
           <button
             onClick={() => {
@@ -105,7 +105,7 @@ export function CardActionsMenu({
               <path d="M10 11v6M14 11v6" />
               <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
             </svg>
-            Xoá nhân viên
+            Delete employee
           </button>
         </div>
       )}

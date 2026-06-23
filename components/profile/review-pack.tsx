@@ -46,14 +46,14 @@ export function ReviewPack({
         onClick={() => setOpen((o) => !o)}
         className="self-start rounded-md border border-zinc-300 px-3 py-2 text-sm"
       >
-        {open ? "Ẩn review pack" : "Review pack"}
+        {open ? "Hide review pack" : "Review pack"}
       </button>
 
       {open && (
         <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-3">
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <label className="flex items-center gap-1">
-              Từ
+              From
               <input
                 type="date"
                 value={from}
@@ -62,7 +62,7 @@ export function ReviewPack({
               />
             </label>
             <label className="flex items-center gap-1">
-              Đến
+              To
               <input
                 type="date"
                 value={to}
@@ -74,7 +74,7 @@ export function ReviewPack({
               onClick={copy}
               className="ml-auto rounded-md bg-[#3f8f6b] px-3 py-1 text-sm text-white"
             >
-              {copied ? "Đã copy ✓" : "Copy"}
+              {copied ? "Copied ✓" : "Copy"}
             </button>
           </div>
           <textarea

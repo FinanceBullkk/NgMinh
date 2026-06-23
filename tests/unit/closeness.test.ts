@@ -15,7 +15,7 @@ describe("closeness", () => {
   it("maps rounded values to manager-facing labels", () => {
     expect(closenessLabel(null)).toBe("—");
     expect(closenessLabel(0)).toBe("—");
-    expect(closenessLabel(2.6)).toBe("Vừa");
-    expect(closenessLabel(99)).toBe("Rất gần");
+    expect(closenessLabel(2.6)).toBe("Moderate");
+    expect(closenessLabel(99)).toBe("Very close");
   });
 });

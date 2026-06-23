@@ -38,7 +38,7 @@ export function ConfirmDestructiveDialog({
         <h2 className="text-lg font-semibold text-red-700">{title}</h2>
         <p className="text-sm text-zinc-600">{message}</p>
         <p className="text-sm">
-          Gõ <code className="rounded bg-zinc-100 px-1">{confirmWord}</code> để xác nhận:
+          Type <code className="rounded bg-zinc-100 px-1">{confirmWord}</code> to confirm:
         </p>
         <input
           value={typed}
@@ -47,14 +47,14 @@ export function ConfirmDestructiveDialog({
         />
         <div className="flex justify-end gap-2">
           <button onClick={onCancel} className="px-3 py-2 text-sm text-zinc-500">
-            Huỷ
+            Cancel
           </button>
           <button
             disabled={pending || typed !== confirmWord}
             onClick={onConfirm}
             className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
-            {pending ? "Đang xoá…" : confirmLabel}
+            {pending ? "Deleting…" : confirmLabel}
           </button>
         </div>
       </div>

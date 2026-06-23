@@ -43,14 +43,14 @@ export function GoalsSection({
           <GoalItem key={g.id} goal={g} employeeId={employeeId} onStatusChange={(s) => onStatusChange(g.id, s)} />
         ))}
         {goals.length === 0 && (
-          <li className="text-xs text-zinc-400">Chưa có goal.</li>
+          <li className="text-xs text-zinc-400">No goals yet.</li>
         )}
       </ul>
       <div className="flex gap-2">
         <input
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Thêm goal…"
+          placeholder="Add goal…"
           className="flex-1 rounded-md border border-zinc-300 px-2 py-1 text-sm"
         />
         <button
@@ -58,7 +58,7 @@ export function GoalsSection({
           disabled={pending || !content.trim()}
           className="rounded-md bg-zinc-800 px-3 py-1 text-sm text-white disabled:opacity-50"
         >
-          Thêm
+          Add
         </button>
       </div>
     </section>

@@ -24,7 +24,7 @@ export function SentimentSparkline({
       width={width}
       height={height}
       role="img"
-      aria-label={`Diễn biến cảm nhận theo thời gian: ${colors.length} ghi nhận`}
+      aria-label={`Sentiment over time: ${colors.length} entries`}
       className="overflow-visible"
     >
       <line x1={r} y1={cy} x2={width - r} y2={cy} stroke="#e4e4e7" strokeWidth={1} />

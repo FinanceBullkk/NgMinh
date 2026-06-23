@@ -19,7 +19,7 @@ export function QuickAdd({
   employees,
   sentiments,
   big,
-  triggerLabel = "+ Ghi hôm nay",
+  triggerLabel = "+ Log today",
   renderTrigger,
   cmdK,
   lazy,
@@ -94,12 +94,12 @@ export function QuickAdd({
 
   const canSave = !!content.trim();
 
-  // `again` = "Lưu & ghi tiếp": save, keep the sheet open, clear note/sentiment so the
+  // `again` = "Save & add another": save, keep the sheet open, clear note/sentiment so the
   // manager can log the next person without reopening.
   const save = (again: boolean) => {
     const targetId = employeeId ?? emp;
-    if (!targetId) return setError("Chọn nhân viên.");
-    if (!content.trim()) return setError("Nhập nội dung.");
+    if (!targetId) return setError("Select an employee.");
+    if (!content.trim()) return setError("Enter some text.");
     const text = content.trim();
     const entryDate = date || todayISO();
     const sent = effSentiments.find((s) => s.id === sentimentId) ?? null;
@@ -208,7 +208,7 @@ export function QuickAdd({
 
           <div className="flex flex-col gap-3.5 overflow-y-auto px-[18px] pb-[18px] pt-1.5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">Ghi hôm nay</h2>
+              <h2 className="text-lg font-bold">Log today</h2>
               <button
                 type="button"
                 onClick={() => setShowDate((v) => !v)}
@@ -220,7 +220,7 @@ export function QuickAdd({
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="16" y1="2" x2="16" y2="6" />
                 </svg>
-                {date === todayISO() ? "Hôm nay" : date}
+                {date === todayISO() ? "Today" : date}
               </button>
             </div>
 
@@ -235,10 +235,10 @@ export function QuickAdd({
 
             {!employeeId && (
               <div>
-                <div className="mb-1.5 text-xs font-semibold text-zinc-500">Nhân viên</div>
+                <div className="mb-1.5 text-xs font-semibold text-zinc-500">Employee</div>
                 <div className="flex flex-wrap gap-2">
                   {loadingData && !effEmployees && (
-                    <span className="text-sm text-zinc-400">Đang tải…</span>
+                    <span className="text-sm text-zinc-400">Loading…</span>
                   )}
                   {(effEmployees ?? []).map((e) => {
                     const on = emp === e.id;
@@ -267,19 +267,19 @@ export function QuickAdd({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={3}
-              placeholder="Quan sát cụ thể (vd: 'trễ deadline X 2 lần') hơn nhãn cảm tính ('lười')."
+              placeholder="Concrete observations (e.g. 'missed deadline X twice') over vague labels ('lazy')."
               className="w-full resize-none rounded-xl border border-zinc-300 p-3 text-base leading-relaxed"
             />
 
             <div>
-              <div className="mb-1.5 text-xs font-semibold text-zinc-500">Loại</div>
+              <div className="mb-1.5 text-xs font-semibold text-zinc-500">Type</div>
               <TypeButtonRow value={type} onChange={setType} />
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-zinc-500">Buổi này thế nào?</div>
+              <div className="text-xs font-semibold text-zinc-500">How did it go?</div>
               <p className="mb-1.5 text-[11px] text-zinc-400">
-                Vẽ vào đường xu hướng — để thấy quan hệ ấm lên hay nguội đi.
+                Plot it on the trend line — to see whether the relationship is warming up or cooling down.
               </p>
               <SentimentButtonRow sentiments={effSentiments} value={sentimentId} onChange={setSentimentId} />
             </div>
@@ -293,7 +293,7 @@ export function QuickAdd({
                 disabled={pending || !canSave}
                 className="shrink-0 rounded-xl border border-zinc-300 px-3.5 py-3 text-sm font-semibold text-zinc-700 disabled:opacity-40"
               >
-                Lưu &amp; ghi tiếp
+                Save &amp; add another
               </button>
               <button
                 type="button"
@@ -301,7 +301,7 @@ export function QuickAdd({
                 disabled={pending || !canSave}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#3f8f6b] py-3 text-sm font-semibold text-white disabled:opacity-40"
               >
-                {pending ? "Đang lưu…" : "Lưu"}
+                {pending ? "Saving…" : "Save"}
                 <span className="rounded-md bg-white/20 px-1.5 py-0.5 text-[11px] font-semibold" aria-hidden>
                   ⌘↵
                 </span>

@@ -57,10 +57,10 @@ export function CurrentTakeEditor({
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between">
         <label htmlFor="current-take" className="text-sm font-medium">
-          Nhận định hiện tại
+          Current take
         </label>
         <span className="text-xs text-zinc-400">
-          {status === "saving" ? "đang lưu…" : status === "saved" ? "đã lưu" : ""}
+          {status === "saving" ? "Saving…" : status === "saved" ? "Saved" : ""}
         </span>
       </div>
       <textarea
@@ -72,7 +72,7 @@ export function CurrentTakeEditor({
           void save();
         }}
         rows={4}
-        placeholder="Ghi quan sát cụ thể (vd: 'trễ deadline X 2 lần tháng này') hơn là nhãn cảm tính ('lười')."
+        placeholder="Concrete observations (e.g. 'missed deadline X twice this month') over vague labels ('lazy')."
         className="w-full resize-y rounded-md border border-zinc-300 p-3 text-base"
       />
     </div>

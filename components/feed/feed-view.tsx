@@ -9,7 +9,7 @@ export function FeedView() {
   const { data, error } = useEntry(cache.feed);
 
   if (error) {
-    return <p className="p-4 text-sm text-red-600">Không tải được Feed. Thử tải lại trang.</p>;
+    return <p className="p-4 text-sm text-red-600">Couldn’t load the Feed. Try reloading the page.</p>;
   }
   if (!data) return <FeedSkeleton />;
 

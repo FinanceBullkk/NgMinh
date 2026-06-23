@@ -56,9 +56,9 @@ export function FeedFilters({
 }) {
   return (
     <div className="flex flex-col gap-3">
-      <Section label="Người">
+      <Section label="Person">
         <button onClick={() => onPerson("")} aria-pressed={!person} className={chip(!person)}>
-          Tất cả
+          All
         </button>
         {employees.map((e) => (
           <button
@@ -72,13 +72,13 @@ export function FeedFilters({
         ))}
       </Section>
 
-      <Section label="Loại">
+      <Section label="Type">
         <button
           onClick={onClearTypes}
           aria-pressed={selectedTypes.size === 0}
           className={chip(selectedTypes.size === 0)}
         >
-          Tất cả
+          All
         </button>
         {ENTRY_TYPES.map((t) => (
           <button
@@ -93,13 +93,13 @@ export function FeedFilters({
       </Section>
 
       {tags.length > 0 && (
-        <Section label="Nhãn">
+        <Section label="Tag">
           <button
             onClick={onClearTags}
             aria-pressed={selectedTags.size === 0}
             className={tagChip(selectedTags.size === 0)}
           >
-            Tất cả
+            All
           </button>
           {tags.map((t) => (
             <button
@@ -128,7 +128,7 @@ export function FeedFilters({
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          Lọc trên toàn bộ dữ liệu, không chỉ phần đang hiển thị.
+          Filters all data, not just what’s shown.
         </div>
       )}
     </div>

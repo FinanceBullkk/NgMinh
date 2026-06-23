@@ -28,7 +28,7 @@ export type EmployeeCard = Employee & {
   sentimentColors: string[];
   nudges: { stale1on1: boolean; cooling: boolean };
   // Plain-language read of recent sentiment level (drives the trend chip). 'cool' aligns with
-  // nudges.cooling — same window/threshold, one notion of "đang nguội".
+  // nudges.cooling — same window/threshold, one notion of "cooling".
   sentimentTrend: SentimentTrend;
 };
 

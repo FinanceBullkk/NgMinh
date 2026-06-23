@@ -9,13 +9,13 @@ export async function createGoal(
   content: string,
 ): Promise<{ goal: Goal } | { error: string }> {
   const c = content.trim();
-  if (!c) return { error: "Nội dung trống." };
+  if (!c) return { error: "Content is empty." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { data, error } = await supabase
     .from("goals")
@@ -36,7 +36,7 @@ export async function updateGoalStatus(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { data, error } = await supabase
     .from("goals")
