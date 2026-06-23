@@ -78,4 +78,4 @@ Default vocabulary — `needs-triage` / `needs-info` / `ready-for-agent` / `read
 
 ### Domain docs
 
-**Multi-context** layout (`CONTEXT-MAP.md` at root → per-context `CONTEXT.md`). See `docs/agents/domain.md`.
+**Single-context** layout (one root `CONTEXT.md` + `docs/adr/`). See `docs/agents/domain.md`.

@@ -8,8 +8,9 @@ import type { Entry, EntryType, FeedEntry, Tag } from "@/lib/types/models";
 
 type DbClient = ReturnType<typeof createClient>;
 
-// Attach employeeName + sentiment {label,color} to raw entry rows.
-async function resolveFeedRows(supabase: DbClient, rows: Entry[]): Promise<FeedEntry[]> {
+// Attach employeeName + sentiment {label,color} to raw entry rows. Exported so the Calendar
+// (which reads a month-scoped slice of the same `entries` table) resolves rows identically.
+export async function resolveFeedRows(supabase: DbClient, rows: Entry[]): Promise<FeedEntry[]> {
   if (rows.length === 0) return [];
   const [emps, sents] = await Promise.all([
     supabase.from("employees").select("id, name"),

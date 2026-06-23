@@ -23,6 +23,7 @@ export function QuickAdd({
   renderTrigger,
   cmdK,
   lazy,
+  initialDate,
 }: {
   employeeId?: string;
   employees?: { id: string; name: string }[];
@@ -34,6 +35,9 @@ export function QuickAdd({
   // lazy: fetch employees + sentiments on first open (global nav/sidebar quick-add) instead
   // of receiving them as props — keeps that data off every page navigation.
   lazy?: boolean;
+  // Preselect entry_date (e.g. opened from a Calendar day → back-dated capture). Defaults to
+  // today; the date is still editable in the sheet.
+  initialDate?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -60,7 +64,7 @@ export function QuickAdd({
     setTimeout(() => contentRef.current?.focus(), 350); // after the slide-up
 
   const openSheet = () => {
-    setDate(todayISO());
+    setDate(initialDate ?? todayISO());
     setShowDate(false);
     setError("");
     setOpen(true);

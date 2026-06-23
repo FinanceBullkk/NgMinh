@@ -20,11 +20,12 @@ describe("keyMatcher", () => {
     expect(m("profilex")).toBe(false);
   });
 
-  it("entry invalidation hits feed/roster/all-profiles, not settings", () => {
-    const m = keyMatcher("feed-bootstrap", "roster", "profile:*");
+  it("entry invalidation hits feed/roster/all-profiles/all-calendar-months, not settings", () => {
+    const m = keyMatcher("feed-bootstrap", "roster", "profile:*", "calendar:*");
     expect(m("feed-bootstrap")).toBe(true);
     expect(m("roster")).toBe(true);
     expect(m("profile:123")).toBe(true);
+    expect(m("calendar:2026-06")).toBe(true);
     expect(m("settings")).toBe(false);
   });
 

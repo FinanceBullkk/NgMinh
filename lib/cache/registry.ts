@@ -6,6 +6,7 @@ import { fetchRoster } from "@/lib/data/roster-client";
 import { fetchSettings } from "@/lib/data/settings-client";
 import { fetchProfile } from "@/lib/data/profile-client";
 import { fetchFeedBootstrap, type FeedBootstrap } from "@/lib/data/feed-client";
+import { fetchEntriesForMonth } from "@/lib/data/calendar-client";
 import type { FeedEntry } from "@/lib/types/models";
 
 // First-page size for the Feed: the bootstrap fetch and the FeedList "load more" page size are
@@ -24,6 +25,9 @@ export const cache = {
   settings: entry("settings", fetchSettings),
   // Parametric: cache.profile(id) reads one profile; cache.profile.all invalidates every profile.
   profile: family("profile", fetchProfile),
+  // Parametric by month: cache.calendar('2026-06') reads one month; cache.calendar.all
+  // invalidates every loaded month after a write.
+  calendar: family("calendar", fetchEntriesForMonth),
   feed: Object.assign(feedEntry, {
     // Drop a just-created entry into the cached Feed immediately (no refetch); the follow-up
     // invalidate.entry() reconciles with the real row.

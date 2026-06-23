@@ -13,16 +13,24 @@ const revalidate = (...targets: CacheTarget[]) =>
 // one of these — never sprinkle mutate() across components. Targets are typed cache refs, so a
 // rename/typo in a key can't silently break invalidation.
 export const invalidate = {
-  // A note created/deleted → Feed list + Roster (sparkline/nudges) + any open Profile timeline.
-  entry: () => revalidate(cache.feed, cache.roster, cache.profile.all),
+  // A note created/deleted → Feed list + Roster (sparkline/nudges) + any open Profile timeline
+  // + every loaded Calendar month (the note's ribbon/day).
+  entry: () => revalidate(cache.feed, cache.roster, cache.profile.all, cache.calendar.all),
   // Sentiment label/color/weight ripple into Feed rows, Roster sparkline, Profile timeline,
-  // and the Settings list itself.
-  sentiment: () => revalidate(cache.settings, cache.feed, cache.roster, cache.profile.all),
+  // Calendar ribbons, and the Settings list itself.
+  sentiment: () =>
+    revalidate(cache.settings, cache.feed, cache.roster, cache.profile.all, cache.calendar.all),
   // Tags: Settings list + Roster chips/filter + Profile tags.
   tag: () => revalidate(cache.settings, cache.roster, cache.profile.all),
-  // Employee add/edit/delete → Roster + Feed (name/cascade) + that Profile (default: all).
+  // Employee add/edit/delete → Roster + Feed (name/cascade) + Calendar (name/cascade) + that
+  // Profile (default: all).
   employee: (id?: string) =>
-    revalidate(cache.roster, cache.feed, id ? cache.profile(id) : cache.profile.all),
+    revalidate(
+      cache.roster,
+      cache.feed,
+      cache.calendar.all,
+      id ? cache.profile(id) : cache.profile.all,
+    ),
   // current_take / closeness show on the Roster card and the Profile.
   takeOrCloseness: (id: string) => revalidate(cache.roster, cache.profile(id)),
   // Goals show only on the Profile.

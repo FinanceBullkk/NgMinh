@@ -1,66 +1,37 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import type { EntryType, FeedEntry, Tag } from "@/lib/types/models";
+import type { FeedEntry } from "@/lib/types/models";
 import { groupByDay } from "@/lib/utils/day-grouping";
 import { mergeFeedPages } from "@/lib/utils/feed-merge";
+import { matchesEntryFilter, type FeedFilterState } from "@/lib/utils/entry-filter";
 import { fetchFeedPage, fetchFeedFiltered } from "@/lib/data/feed-client";
 import { FeedDayGroup } from "./feed-day-group";
-import { FeedFilters } from "./feed-filters";
 
+// The stream rendering of the by-time axis. Filter state is owned by the shell and passed in,
+// so the List and Calendar views stay in sync. This component keeps pagination (load-more) and
+// the global (all-time) refetch that a paginated list needs so filters aren't falsely bounded.
 export function FeedList({
   initialEntries,
   pageSize,
-  employees,
-  tags,
-  tagsByEmployee,
+  filter,
 }: {
   initialEntries: FeedEntry[];
   pageSize: number;
-  employees: { id: string; name: string }[];
-  tags: Tag[];
-  tagsByEmployee: Record<string, string[]>;
+  filter: FeedFilterState;
 }) {
-  // First page comes LIVE from the SWR prop (so a new/changed note shows immediately,
-  // without re-mounting); "older" holds pages fetched via load-more.
+  const { person, selectedTypes, tagEmployeeIds, filtering, filterKey } = filter;
+
+  // First page comes LIVE from the SWR prop (so a new/changed note shows immediately, without
+  // re-mounting); "older" holds pages fetched via load-more.
   const [older, setOlder] = useState<FeedEntry[]>([]);
   const [exhausted, setExhausted] = useState(initialEntries.length < pageSize);
   const items = useMemo(() => mergeFeedPages(initialEntries, older), [initialEntries, older]);
-  const [person, setPerson] = useState("");
-  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
-  const [selectedTypes, setSelectedTypes] = useState<Set<EntryType>>(new Set());
-  // Cached global result, tagged with the filter that produced it (so a stale result is
-  // never shown after the filter changes).
-  const [filtered, setFiltered] = useState<{ key: string; items: FeedEntry[] } | null>(null);
+  // Cached global result, tagged with the filter that produced it (so a stale result is never
+  // shown after the filter changes).
+  const [fetched, setFetched] = useState<{ key: string; items: FeedEntry[] } | null>(null);
   const [loading, start] = useTransition();
   const [filterPending, startFilter] = useTransition();
-
-  const toggle = <T,>(set: Set<T>, v: T, apply: (s: Set<T>) => void) => {
-    const next = new Set(set);
-    if (next.has(v)) next.delete(v);
-    else next.add(v);
-    apply(next);
-  };
-
-  const filtering = !!person || selectedTypes.size > 0 || selectedTags.size > 0;
-
-  // Employee ids allowed by the tag filter (null = no tag constraint). Computed here
-  // because the client already holds the tag→employee map; the server filter just needs ids.
-  const tagEmployeeIds = useMemo(() => {
-    if (selectedTags.size === 0) return null;
-    const ids: string[] = [];
-    for (const [empId, tagIds] of Object.entries(tagsByEmployee)) {
-      if (tagIds.some((t) => selectedTags.has(t))) ids.push(empId);
-    }
-    return ids;
-  }, [selectedTags, tagsByEmployee]);
-
-  // Identity of the active filter — drives the global fetch and validates its cached result.
-  const filterKey = useMemo(
-    () =>
-      `${person}|${[...selectedTypes].sort().join(",")}|${(tagEmployeeIds ?? []).slice().sort().join(",")}`,
-    [person, selectedTypes, tagEmployeeIds],
-  );
 
   // Global filter: when any filter is active, ask the server for ALL matches (not just the
   // loaded page) so older entries aren't falsely hidden.
@@ -73,27 +44,19 @@ export function FeedList({
         types: [...selectedTypes],
         employeeIds: tagEmployeeIds,
       });
-      setFiltered({ key, items: res });
+      setFetched({ key, items: res });
     });
   }, [filtering, filterKey, person, selectedTypes, tagEmployeeIds]);
 
-  // Optimistic view of already-loaded items while the global query is in flight, so the
-  // list reacts instantly; replaced by `filtered` (the authoritative superset) on arrival.
+  // Optimistic view of already-loaded items while the global query is in flight.
   const localFiltered = useMemo(
-    () =>
-      items.filter((e) => {
-        if (person && e.employee_id !== person) return false;
-        if (selectedTypes.size && !selectedTypes.has(e.type)) return false;
-        if (tagEmployeeIds && !tagEmployeeIds.includes(e.employee_id)) return false;
-        return true;
-      }),
-    [items, person, selectedTypes, tagEmployeeIds],
+    () => items.filter((e) => matchesEntryFilter(e, filter)),
+    [items, filter],
   );
 
   // Use the global result only when it matches the current filter; otherwise the optimistic
   // local view bridges the gap until the matching fetch resolves.
-  const globalMatch =
-    filtering && filtered && filtered.key === filterKey ? filtered.items : null;
+  const globalMatch = filtering && fetched && fetched.key === filterKey ? fetched.items : null;
   const source = filtering ? (globalMatch ?? localFiltered) : items;
   const groups = useMemo(() => groupByDay(source), [source]);
 
@@ -105,26 +68,7 @@ export function FeedList({
     });
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:mx-auto lg:max-w-3xl lg:px-7 lg:py-6">
-      <div className="flex items-baseline gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight lg:text-[25px]">Feed</h1>
-        <span className="hidden text-sm text-zinc-400 lg:inline">toàn đội, theo thời gian</span>
-      </div>
-
-      <FeedFilters
-        employees={employees}
-        tags={tags}
-        person={person}
-        onPerson={setPerson}
-        selectedTags={selectedTags}
-        onToggleTag={(id) => toggle(selectedTags, id, setSelectedTags)}
-        onClearTags={() => setSelectedTags(new Set())}
-        selectedTypes={selectedTypes}
-        onToggleType={(t) => toggle(selectedTypes, t, setSelectedTypes)}
-        onClearTypes={() => setSelectedTypes(new Set())}
-        filtering={filtering}
-      />
-
+    <>
       <div className={filterPending ? "opacity-60 transition-opacity" : "transition-opacity"}>
         {groups.length === 0 ? (
           <p className="py-12 text-center text-sm text-zinc-500">
@@ -144,6 +88,6 @@ export function FeedList({
           {loading ? "Đang tải…" : "Tải thêm cũ hơn"}
         </button>
       )}
-    </div>
+    </>
   );
 }

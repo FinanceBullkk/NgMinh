@@ -1,10 +1,10 @@
 "use client";
 
-import { useEntry, cache, FEED_PAGE } from "@/lib/cache";
-import { FeedList } from "./feed-list";
+import { useEntry, cache } from "@/lib/cache";
+import { FeedShell } from "./feed-shell";
 
-// Client-rendered Feed: fetches directly from Supabase (browser→DB), cached by SWR so
-// revisiting the tab shows data instantly and refreshes in the background (Firebase-like).
+// Client-rendered Feed boundary: fetches the bootstrap from Supabase (browser→DB), cached by
+// SWR, then hands it to the shell which owns the List/Calendar toggle + shared filters.
 export function FeedView() {
   const { data, error } = useEntry(cache.feed);
 
@@ -13,15 +13,7 @@ export function FeedView() {
   }
   if (!data) return <FeedSkeleton />;
 
-  return (
-    <FeedList
-      initialEntries={data.entries}
-      pageSize={FEED_PAGE}
-      employees={data.employees}
-      tags={data.tags}
-      tagsByEmployee={data.tagsByEmployee}
-    />
-  );
+  return <FeedShell bootstrap={data} />;
 }
 
 // Lightweight placeholder while the first fetch resolves (shape matches the real layout).

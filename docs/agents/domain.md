@@ -1,14 +1,12 @@
 # Domain Docs
 
-How the engineering skills should consume this repo's domain documentation when exploring
-the codebase. **This repo uses a multi-context layout.**
+How the engineering skills should consume this repo's domain documentation when exploring the
+codebase. **This repo uses a single-context layout** (one Next.js app, one domain).
 
 ## Before exploring, read these
 
-- **`CONTEXT-MAP.md`** at the repo root — it points at one `CONTEXT.md` per context. Read
-  each `CONTEXT.md` relevant to the topic you're about to work in.
-- **`docs/adr/`** at the root — system-wide architectural decisions.
-- **`src/<context>/docs/adr/`** — decisions scoped to a specific context.
+- **`CONTEXT.md`** at the repo root — the project's glossary / ubiquitous language.
+- **`docs/adr/`** — read ADRs that touch the area you're about to work in.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't
 suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs`
@@ -17,29 +15,26 @@ get resolved.
 
 ## File structure
 
-Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
+Single-context repo (most repos):
 
 ```
 /
-├── CONTEXT-MAP.md
-├── docs/adr/                          ← system-wide decisions
-└── src/
-    ├── ordering/
-    │   ├── CONTEXT.md
-    │   └── docs/adr/                  ← context-specific decisions
-    └── billing/
-        ├── CONTEXT.md
-        └── docs/adr/
+├── CONTEXT.md
+├── docs/adr/
+│   ├── 0001-event-sourced-orders.md
+│   └── 0002-postgres-for-write-model.md
+└── app/  components/  lib/  …
 ```
 
-If this repo later collapses to a single context, switch to one `CONTEXT.md` + `docs/adr/`
-at the root and update the layout note above.
+If this repo ever splits into multiple bounded contexts (a monorepo), switch to a
+`CONTEXT-MAP.md` at the root pointing at one `CONTEXT.md` per context, and update the layout
+note above.
 
 ## Use the glossary's vocabulary
 
-When your output names a domain concept (in an issue title, a refactor proposal, a
-hypothesis, a test name), use the term as defined in the relevant `CONTEXT.md`. Don't drift
-to synonyms the glossary explicitly avoids.
+When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis,
+a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary
+explicitly avoids.
 
 If the concept you need isn't in the glossary yet, that's a signal — either you're inventing
 language the project doesn't use (reconsider) or there's a real gap (note it for
