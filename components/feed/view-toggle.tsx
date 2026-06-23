@@ -12,8 +12,8 @@ export function ViewToggle({
   onChange: (v: FeedViewMode) => void;
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-zinc-200 p-0.5" role="tablist" aria-label="Kiểu xem">
-      <Btn active={view === "list"} onClick={() => onChange("list")} label="Danh sách">
+    <div className="inline-flex rounded-lg border border-zinc-200 p-0.5" role="tablist" aria-label="View mode">
+      <Btn active={view === "list"} onClick={() => onChange("list")} label="List">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
           <line x1="8" y1="6" x2="21" y2="6" />
           <line x1="8" y1="12" x2="21" y2="12" />
@@ -23,7 +23,7 @@ export function ViewToggle({
           <circle cx="3.5" cy="18" r="1.3" fill="currentColor" stroke="none" />
         </svg>
       </Btn>
-      <Btn active={view === "calendar"} onClick={() => onChange("calendar")} label="Lịch">
+      <Btn active={view === "calendar"} onClick={() => onChange("calendar")} label="Calendar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <line x1="3" y1="9" x2="21" y2="9" />

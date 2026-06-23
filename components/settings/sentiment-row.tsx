@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { SentimentOption } from "@/lib/types/models";
+import { PolarityControl } from "./polarity-control";
+import { isSelfEvidentLabel, selfEvidentPolarity } from "@/lib/utils/sentiment-polarity";
 
 // 8 preset colors for the swatch popover palette (spec "Web - Settings" mock).
 const PRESET_COLORS = [
@@ -14,13 +16,6 @@ const PRESET_COLORS = [
   "#c79a2e", // amber/gold
   "#4f8a8b", // teal
 ];
-
-// Polarity (weight) segments — word labels so the meaning is obvious (was − / 0 / +).
-const POLARITY_SEGMENTS = [
-  { label: "Tiêu cực", value: -1, activeColor: "#c45b4c" },
-  { label: "Trung tính", value: 0, activeColor: "#9aa0a6" },
-  { label: "Tích cực", value: 1, activeColor: "#3f8f6b" },
-] as const;
 
 // ColorSwatchPopover: shows a 26×26px swatch button; click opens a 2×4 grid palette.
 // Clicking a color selects it and closes. Outside-click closes.
@@ -62,7 +57,7 @@ function ColorSwatchPopover({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        aria-label="Chọn màu"
+        aria-label="Choose color"
         className="h-[26px] w-[26px] rounded-lg border border-black/10 disabled:opacity-50"
         style={{ backgroundColor: color }}
       />
@@ -71,7 +66,7 @@ function ColorSwatchPopover({
         <div
           className="absolute left-0 top-8 z-20 grid grid-cols-4 gap-1.5 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg"
           role="dialog"
-          aria-label="Bảng màu"
+          aria-label="Color palette"
         >
           {PRESET_COLORS.map((c) => (
             <button
@@ -96,50 +91,6 @@ function ColorSwatchPopover({
   );
 }
 
-// PolarityControl: 3-segment button group "− / 0 / +" in one bordered rounded pill.
-// Active segment is filled with its designated color; inactive = white bg + gray text.
-function PolarityControl({
-  weight,
-  onChange,
-  disabled,
-}: {
-  weight: number;
-  onChange: (w: number) => void;
-  disabled: boolean;
-}) {
-  return (
-    <div
-      className="flex overflow-hidden rounded-lg border border-zinc-300"
-      role="group"
-      aria-label="Độ phân cực"
-    >
-      {POLARITY_SEGMENTS.map((seg, i) => {
-        const isActive = weight === seg.value;
-        return (
-          <button
-            key={seg.value}
-            type="button"
-            disabled={disabled}
-            onClick={() => onChange(seg.value)}
-            aria-pressed={isActive}
-            className={[
-              "px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap transition-colors disabled:opacity-50",
-              i > 0 ? "border-l border-zinc-300" : "",
-            ].join(" ")}
-            style={
-              isActive
-                ? { backgroundColor: seg.activeColor, color: "#ffffff" }
-                : { backgroundColor: "#ffffff", color: "#71717a" }
-            }
-          >
-            {seg.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 // ArchiveIcon: a box-archive SVG icon (Lucide-style, 16×16).
 function ArchiveIcon() {
   return (
@@ -157,6 +108,26 @@ function ArchiveIcon() {
       <rect x="2" y="3" width="20" height="5" rx="1" />
       <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
       <path d="M10 12h4" />
+    </svg>
+  );
+}
+
+// PencilIcon: a faint edit affordance inside the name field so it reads as editable (mobile too).
+function PencilIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
     </svg>
   );
 }
@@ -222,9 +193,14 @@ export function SentimentRow({
   };
 
   const handleLabelBlur = () => {
-    if (label.trim() && label.trim() !== option.label) {
-      persist(label, color, weight);
-    }
+    const trimmed = label.trim();
+    if (!trimmed || trimmed === option.label) return;
+    // Renaming to a self-evident label (e.g. "Positive") fixes its polarity automatically and
+    // hides the control; renaming to a custom name keeps the current weight (now editable).
+    const implied = selfEvidentPolarity(trimmed);
+    const nextWeight = implied ?? weight;
+    if (nextWeight !== weight) setWeight(nextWeight);
+    persist(trimmed, color, nextWeight);
   };
 
   return (
@@ -236,21 +212,30 @@ export function SentimentRow({
         disabled={disabled}
       />
 
-      {/* Inline label input — transparent background, grows to fill space */}
-      <input
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        onBlur={handleLabelBlur}
-        aria-label="Tên cảm nhận"
-        className="min-w-[110px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:underline"
-      />
+      {/* Inline label field — styled as an editable input (border + pencil) so it's obviously
+          tappable to rename, on mobile too. Saves on blur. */}
+      <div className="relative min-w-[110px] flex-1">
+        <input
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          onBlur={handleLabelBlur}
+          aria-label="Sentiment name"
+          placeholder="Name"
+          className="w-full rounded-md border border-zinc-200 bg-white py-1 pl-2 pr-7 text-sm text-zinc-800 outline-none transition-colors placeholder:text-zinc-400 hover:border-zinc-300 focus:border-[#3f8f6b] focus:ring-2 focus:ring-[#3f8f6b]/20"
+        />
+        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-zinc-300">
+          <PencilIcon />
+        </span>
+      </div>
 
-      {/* 3-segment polarity control */}
-      <PolarityControl
-        weight={weight}
-        onChange={handleWeightChange}
-        disabled={disabled}
-      />
+      {/* Polarity only matters when the name doesn't already reveal direction — so the default
+          Positive/Neutral/Negative rows show nothing, and only custom names get the control. */}
+      {!isSelfEvidentLabel(label) && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-zinc-400">Counts as</span>
+          <PolarityControl weight={weight} onChange={handleWeightChange} disabled={disabled} />
+        </div>
+      )}
 
       {/* Archive icon button */}
       <button
@@ -259,11 +244,11 @@ export function SentimentRow({
         onClick={() => onArchive(option.id)}
         title={
           canArchive
-            ? "Lưu trữ cảm nhận này"
-            : "Phải còn ít nhất 1 cảm nhận đang dùng"
+            ? "Archive this sentiment"
+            : "At least 1 sentiment must stay in use"
         }
         className="shrink-0 text-zinc-400 transition-colors hover:text-zinc-600 disabled:opacity-30"
-        aria-label="Lưu trữ"
+        aria-label="Archive"
       >
         <ArchiveIcon />
       </button>

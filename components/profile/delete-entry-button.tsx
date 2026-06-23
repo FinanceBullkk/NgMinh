@@ -16,7 +16,7 @@ export function DeleteEntryButton({
   const [pending, start] = useTransition();
   const [err, setErr] = useState("");
   const onClick = () => {
-    if (!window.confirm("Xoá ghi nhận này? Không thể hoàn tác.")) return;
+    if (!window.confirm("Delete this entry? This cannot be undone.")) return;
     start(async () => {
       const res = await deleteEntry(entryId, employeeId);
       if (res?.error) return setErr(res.error); // surface the failure; do NOT invalidate (row stays)
@@ -31,7 +31,7 @@ export function DeleteEntryButton({
         type="button"
         onClick={onClick}
         disabled={pending}
-        aria-label="Xoá ghi nhận"
+        aria-label="Delete entry"
         className="flex items-center p-1 text-zinc-300 hover:text-red-500 disabled:opacity-50"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden>

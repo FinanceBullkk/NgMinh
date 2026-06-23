@@ -42,17 +42,17 @@ export function GoalItem({
       <span className="flex shrink-0 gap-2 text-xs">
         {goal.status !== "done" && (
           <button disabled={pending} onClick={() => set("done")} className="text-[#3f8f6b]">
-            ✓ Xong
+            ✓ Done
           </button>
         )}
         {goal.status !== "open" && (
           <button disabled={pending} onClick={() => set("open")} className="text-zinc-500">
-            ↺ Mở lại
+            ↺ Reopen
           </button>
         )}
         {goal.status !== "dropped" && (
           <button disabled={pending} onClick={() => set("dropped")} className="text-zinc-400">
-            ✕ Bỏ
+            ✕ Drop
           </button>
         )}
       </span>

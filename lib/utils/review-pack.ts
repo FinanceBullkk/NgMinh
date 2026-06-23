@@ -15,7 +15,7 @@ export function buildReviewMarkdown(
 ): string {
   const wins = entries.filter((e) => e.type === "win" && inRange(e.entry_date, from, to));
   const concerns = entries.filter((e) => e.type === "concern" && inRange(e.entry_date, from, to));
-  const section = (rows: string[]) => (rows.length ? rows : ["- (không có)"]);
+  const section = (rows: string[]) => (rows.length ? rows : ["- (none)"]);
 
   return [
     `## ${name} — review ${from} → ${to}`,

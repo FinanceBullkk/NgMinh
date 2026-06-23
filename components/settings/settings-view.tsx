@@ -13,7 +13,7 @@ export function SettingsView() {
   if (error) {
     return (
       <p className="p-4 text-sm text-red-600">
-        Không tải được Settings. Thử tải lại trang.
+        Couldn&apos;t load Settings. Try reloading the page.
       </p>
     );
   }

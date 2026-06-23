@@ -32,7 +32,7 @@ export function RosterSearch({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Tìm tên hoặc nội dung note…"
+        placeholder="Search by name or note content…"
         className="w-full rounded-md border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-zinc-300 focus:bg-white focus:outline-none"
       />
     </div>

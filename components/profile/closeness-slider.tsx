@@ -26,16 +26,16 @@ export function ClosenessSlider({
     });
 
   if (variant === "pips") {
-    // Desktop compact: "Mức hiểu ● ● ● ○ ○  Vừa"
+    // Desktop compact: "Closeness ● ● ● ○ ○  Medium"
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-zinc-500">Mức hiểu</span>
-        <div className="flex items-center gap-1" role="group" aria-label="Mức hiểu">
+        <span className="text-xs font-medium text-zinc-500">Closeness</span>
+        <div className="flex items-center gap-1" role="group" aria-label="Closeness">
           {[1, 2, 3, 4, 5].map((pip) => (
             <button
               key={pip}
               type="button"
-              aria-label={`Mức ${pip}`}
+              aria-label={`Level ${pip}`}
               aria-pressed={pip <= value}
               onClick={() => {
                 setValue(pip);
@@ -57,7 +57,7 @@ export function ClosenessSlider({
   // Default: range slider (mobile header)
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-zinc-500">Gần gũi</span>
+      <span className="text-sm text-zinc-500">Closeness</span>
       <input
         type="range"
         min={1}

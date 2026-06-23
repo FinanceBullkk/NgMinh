@@ -21,9 +21,9 @@ describe("new manager sentiment seed", () => {
 
     expect(result.error).toBeNull();
     expect(result.data).toEqual([
-      { label: "Tích cực", color: "#3F8F6B", order_index: 0, weight: 1, user_id: context.userA.id },
-      { label: "Trung tính", color: "#9AA0A6", order_index: 1, weight: 0, user_id: context.userA.id },
-      { label: "Tiêu cực", color: "#C45B4C", order_index: 2, weight: -1, user_id: context.userA.id },
+      { label: "Positive", color: "#3F8F6B", order_index: 0, weight: 1, user_id: context.userA.id },
+      { label: "Neutral", color: "#9AA0A6", order_index: 1, weight: 0, user_id: context.userA.id },
+      { label: "Negative", color: "#C45B4C", order_index: 2, weight: -1, user_id: context.userA.id },
     ]);
   });
 });

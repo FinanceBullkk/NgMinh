@@ -7,7 +7,7 @@ operational (manually provision the single account); the code is ready.
 ## Live deployment (2026-06-21)
 - **App:** https://ng-minh.vercel.app (Vercel, GitHub integration)
 - **Supabase:** project `lrejfdadkxusivskplmp` ("Hia", `https://lrejfdadkxusivskplmp.supabase.co`), region Southeast Asia (Singapore). NOTE: the earlier `kkhctymyfkhlnowjrmmn` (ap-northeast-1) project was removed — see `docs/migrate-to-singapore.md`.
-- **Status:** all 14 migrations pushed (incl. security hardening 009–014); verified end-to-end in prod (auth, Server Actions, RLS isolation, seed trigger, PWA). 
+- **Status:** all 15 migrations pushed (incl. security hardening 009–014 + English seed `015`); verified end-to-end in prod (auth, Server Actions, RLS isolation, seed trigger, PWA). 
 - **Remaining user steps:** (1) provision the single manager account via Google sign-in — signup is OFF, so use the temporary-toggle flow in §3d; (2) set Auth → URL Configuration Site URL/Redirect to the app URL (§3c); (3) replace placeholder icons.
 
 ## 0. In-repo readiness (✅ already applied)
@@ -24,7 +24,7 @@ operational (manually provision the single account); the code is ready.
 Dashboard → New project. Choose **Postgres 17** (matches `supabase/config.toml` `db.major_version=17`;
 otherwise set that to match). Pick a nearby region. `gen_random_uuid()` is core (PG13+), no extension needed.
 
-## 3. Link CLI + push the migrations (14)
+## 3. Link CLI + push the migrations (15)
 `supabase db push` migrates **schema only** (no `config.toml` auth settings; there is no `seed.sql`).
 ```bash
 # from repo root
@@ -37,8 +37,10 @@ owner `FOR ALL` policy + grants to `authenticated`) → `005_triggers_updated_at
 `006_new_user_sentiment_seed` (`handle_new_user` seeds 3 sentiments) → `007_sentiment_weight`
 (adds `weight` + redefines the seed) → `008_cross_owner_integrity` → **security hardening 009–014**
 (`009` same-owner sentiment FK · `010` entries append-only · `011` least-privilege grants/policies ·
-`012` `delete_own_account` RPC · `013` length limits · `014` `security_events` audit). Cloud-portable
-(no ports/paths/localhost). Run once — DDL is not idempotent.
+`012` `delete_own_account` RPC · `013` length limits · `014` `security_events` audit) →
+`015_english_sentiment_seed` (English default sentiment labels for new users; redefines
+`handle_new_user` — runs last, ordering-independent, and `CREATE OR REPLACE` preserves the
+grant revoked in `011`). Cloud-portable (no ports/paths/localhost). Run once — DDL is not idempotent.
 
 ## 4. Configure Auth URLs in the Supabase dashboard
 `config.toml site_url` is **local-only** and never reaches cloud. Dashboard →

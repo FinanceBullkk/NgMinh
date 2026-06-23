@@ -8,13 +8,13 @@ export type CreateTagResult = { id: string } | { error: string };
 // Reuses an existing tag (case-insensitive) or creates one. unique(user_id, name) guards dups.
 export async function createTag(name: string): Promise<CreateTagResult> {
   const n = name.trim();
-  if (!n) return { error: "Tên tag trống." };
+  if (!n) return { error: "Tag name is empty." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { data: existing } = await supabase
     .from("tags")
@@ -42,7 +42,7 @@ export async function addTagToEmployee(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("employee_tags")
@@ -62,7 +62,7 @@ export async function removeTagFromEmployee(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("employee_tags")
@@ -81,12 +81,12 @@ export async function renameTag(
   name: string,
 ): Promise<{ error?: string }> {
   const n = name.trim();
-  if (!n) return { error: "Tên trống." };
+  if (!n) return { error: "Name is empty." };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase.from("tags").update({ name: n }).eq("id", id);
   if (error) return { error: error.message };
@@ -101,7 +101,7 @@ export async function deleteTag(id: string): Promise<{ error?: string }> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   // FK CASCADE removes the employee_tags links.
   const { error } = await supabase.from("tags").delete().eq("id", id);

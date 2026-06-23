@@ -59,6 +59,6 @@ describe("buildReviewMarkdown", () => {
   });
   it("renders empty sections gracefully", () => {
     const empty = buildReviewMarkdown("An", [], [], "2026-06-01", "2026-06-30");
-    expect(empty).toContain("- (không có)");
+    expect(empty).toContain("- (none)");
   });
 });

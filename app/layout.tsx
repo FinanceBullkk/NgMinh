@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "Team Tracker",
   description:
-    "Sổ tay riêng của manager: ghi quan sát & theo dõi nhận định về nhân viên theo thời gian.",
+    "A manager's private notebook: log observations and track your read on each team member over time.",
   applicationName: "Team Tracker",
   // iOS standalone PWA support (no beforeinstallprompt on Safari — install is manual).
   appleWebApp: {
@@ -33,7 +33,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="vi"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

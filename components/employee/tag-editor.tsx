@@ -70,7 +70,7 @@ export function TagEditor({
           </button>
         ))}
         {tags.length === 0 && (
-          <span className="text-xs text-zinc-400">Chưa có tag.</span>
+          <span className="text-xs text-zinc-400">No tags yet.</span>
         )}
       </div>
 
@@ -93,7 +93,7 @@ export function TagEditor({
         <input
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          placeholder="Tag mới…"
+          placeholder="New tag…"
           className="flex-1 rounded-md border border-zinc-300 px-2 py-1 text-sm"
         />
         <button
@@ -101,7 +101,7 @@ export function TagEditor({
           onClick={createAndAdd}
           className="rounded-md bg-zinc-800 px-3 py-1 text-sm text-white disabled:opacity-50"
         >
-          Thêm
+          Add
         </button>
       </div>
     </div>

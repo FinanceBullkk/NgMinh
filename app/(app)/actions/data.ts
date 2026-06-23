@@ -18,7 +18,7 @@ export async function deleteAllData(): Promise<DestructiveResult> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   if (!isRecentlyAuthenticated(user.last_sign_in_at, Date.now())) {
     await logEvent(supabase, "reauth_required", { action: "delete_all" });
@@ -28,7 +28,7 @@ export async function deleteAllData(): Promise<DestructiveResult> {
   try {
     await deletePeopleDataForClient(supabase);
   } catch (error) {
-    return { error: error instanceof Error ? error.message : "Không thể xoá dữ liệu." };
+    return { error: error instanceof Error ? error.message : "Could not delete data." };
   }
 
   await logEvent(supabase, "delete_all", {});
@@ -45,7 +45,7 @@ export async function deleteAccount(): Promise<{ error?: string; needsReauth?: b
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   if (!isRecentlyAuthenticated(user.last_sign_in_at, Date.now())) {
     await logEvent(supabase, "reauth_required", { action: "delete_account" });

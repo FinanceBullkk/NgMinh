@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { EmployeeCard } from "@/lib/types/models";
 import { SentimentSparkline } from "@/components/sparkline/sentiment-sparkline";
+import { SentimentTrendChip } from "@/components/sentiment/sentiment-trend-chip";
 import { closenessLabel } from "@/lib/utils/closeness";
 import { CardActionsMenu } from "./card-actions-menu";
 
@@ -50,34 +51,27 @@ export function EmployeeCardView({
           {label}
         </span>
 
-        {/* ⋯ overflow menu — replaces inline Sửa / Xoá text buttons */}
+        {/* ⋯ overflow menu — replaces inline Edit / Delete text buttons */}
         <CardActionsMenu onEdit={onEdit} onDelete={onDelete} />
       </div>
 
-      {/* Row 2: nudge badges (cooling = red, stale 1:1 = amber) */}
-      {(e.nudges.cooling || e.nudges.stale1on1) && (
+      {/* Row 2: stale-1:1 nudge (cooling is now shown by the trend chip below) */}
+      {e.nudges.stale1on1 && (
         <div className="flex flex-wrap gap-1">
-          {e.nudges.cooling && (
-            <span
-              className="rounded-full px-2 py-0.5 text-xs font-medium"
-              style={{ background: "#fde8e6", color: "#b3392c" }}
-            >
-              Đang nguội
-            </span>
-          )}
-          {e.nudges.stale1on1 && (
-            <span
-              className="rounded-full px-2 py-0.5 text-xs font-medium"
-              style={{ background: "#fcefcf", color: "#92660a" }}
-            >
-              Lâu chưa 1:1
-            </span>
-          )}
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{ background: "#fcefcf", color: "#92660a" }}
+          >
+            1:1 overdue
+          </span>
         </div>
       )}
 
-      {/* Row 3: sparkline dots */}
-      <SentimentSparkline colors={e.sentimentColors} />
+      {/* Row 3: sparkline + plain-language trend read-out */}
+      <div className="flex items-center gap-2">
+        <SentimentSparkline colors={e.sentimentColors} />
+        <SentimentTrendChip trend={e.sentimentTrend} />
+      </div>
 
       {/* Row 4: current take clamped to 2 lines */}
       {e.current_take && (

@@ -39,8 +39,8 @@ describe("shiftMonth", () => {
 });
 
 describe("monthLabel", () => {
-  it("renders the Vietnamese heading", () => {
-    expect(monthLabel("2026-06")).toBe("Tháng 6 2026");
+  it("renders the month heading", () => {
+    expect(monthLabel("2026-06")).toBe("June 2026");
   });
 });
 

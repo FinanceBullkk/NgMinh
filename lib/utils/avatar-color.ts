@@ -12,7 +12,7 @@ export function avatarColor(seed: string): string {
   return PALETTE[h % PALETTE.length];
 }
 
-// First letter for the avatar badge (Vietnamese names included, e.g. "Bình" → "B").
+// First letter for the avatar badge (handles accented names too, e.g. "Binh" → "B").
 export function avatarInitial(name: string): string {
   const t = name.trim();
   return t ? t.charAt(0).toUpperCase() : "—";

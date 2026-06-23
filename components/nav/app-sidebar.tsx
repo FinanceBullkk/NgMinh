@@ -49,7 +49,7 @@ export function AppSidebar() {
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Ghi nhanh
+              Quick add
             </span>
             <span className="rounded-[5px] bg-white/20 px-1.5 py-0.5 text-[11px] font-semibold">⌘K</span>
           </button>
@@ -68,10 +68,10 @@ export function AppSidebar() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="truncate text-[12.5px] font-semibold text-zinc-800">{userEmail}</div>
-          <div className="text-[11px] text-zinc-400">Quản lý</div>
+          <div className="text-[11px] text-zinc-400">Manager</div>
         </div>
         <form action={signOut}>
-          <button type="submit" aria-label="Đăng xuất" className="flex text-zinc-400 hover:text-zinc-700">
+          <button type="submit" aria-label="Sign out" className="flex text-zinc-400 hover:text-zinc-700">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden>
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />

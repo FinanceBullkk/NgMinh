@@ -115,8 +115,8 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
   return (
     <section className="flex flex-col gap-3">
       <SectionHeader
-        title="Mức cảm nhận"
-        description="Mỗi mức có một nhãn + màu (màu chấm trên sparkline). Đánh dấu nó là Tiêu cực / Trung tính / Tích cực để app biết ai 'đang nguội' (gần đây toàn tiêu cực). 3 mức mặc định đã đặt đúng — thường không cần đổi."
+        title="Sentiment"
+        description="Each sentiment has a name + color (the dot color on the sparkline). The 3 defaults are ready to use. If you add a custom name, you'll set how it counts — positive, neutral or negative — so the app can still tell who's 'cooling'."
       />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -148,7 +148,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
       {archived.length > 0 && (
         <div className="flex flex-col gap-1.5">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
-            ĐÃ LƯU TRỮ · vẫn giữ màu cho lịch sử cũ
+            ARCHIVED · still keep color for old history
           </p>
           <ul className="flex flex-col gap-1">
             {archived.map((s) => (
@@ -168,7 +168,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
                   onClick={() => onUnarchive(s.id)}
                   className="text-xs text-[#3f8f6b] hover:underline disabled:opacity-50"
                 >
-                  Khôi phục
+                  Restore
                 </button>
               </li>
             ))}

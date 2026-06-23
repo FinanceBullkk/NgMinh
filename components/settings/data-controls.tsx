@@ -5,7 +5,7 @@ import { deleteAllData, deleteAccount } from "@/app/(app)/actions/data";
 import { startGoogleSignIn } from "@/lib/auth/oauth-client";
 import { ConfirmDestructiveDialog } from "./confirm-destructive-dialog";
 
-// DataControls: "Dữ liệu" section. Export JSON (neutral) + two destructive rows: delete employee
+// DataControls: "Data" section. Export JSON (neutral) + two destructive rows: delete employee
 // data only (keeps account + sentiment config) and delete the whole account. Both open a
 // type-to-confirm dialog and are step-up gated server-side (audit H4): if the session is not
 // freshly authenticated, the action returns needsReauth and we prompt a fresh Google login first.
@@ -20,7 +20,7 @@ export function DataControls() {
       const res = await deleteAllData();
       if (res?.needsReauth) return (setConfirm(null), setNeedsReauth(true));
       if (res?.error) return setMsg(res.error);
-      setMsg("Đã xoá toàn bộ dữ liệu nhân viên.");
+      setMsg("All employee data deleted.");
       setConfirm(null);
     });
 
@@ -35,9 +35,9 @@ export function DataControls() {
     <section className="flex flex-col gap-3">
       {/* Section header */}
       <div className="flex flex-col gap-0.5">
-        <h2 className="text-[15px] font-bold">Dữ liệu</h2>
+        <h2 className="text-[15px] font-bold">Data</h2>
         <p className="text-sm text-zinc-500">
-          Dữ liệu là của riêng bạn — luôn xuất ra hoặc xoá được.
+          Your data is yours — always exportable or deletable.
         </p>
       </div>
 
@@ -46,14 +46,14 @@ export function DataControls() {
       {needsReauth && (
         <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3">
           <p className="text-sm text-amber-800">
-            Vì an toàn, hãy đăng nhập lại để xác nhận thao tác xoá, rồi thử lại.
+            For your security, please sign in again to confirm the deletion, then retry.
           </p>
           <button
             type="button"
             onClick={() => startGoogleSignIn({ reauth: true, next: "/settings" })}
             className="self-start rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
           >
-            Đăng nhập lại với Google
+            Sign in again with Google
           </button>
         </div>
       )}
@@ -64,9 +64,9 @@ export function DataControls() {
         {/* Row 1: Export data */}
         <div className="flex items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-medium">Xuất dữ liệu</span>
+            <span className="text-sm font-medium">Export data</span>
             <span className="text-xs text-zinc-500">
-              Toàn bộ dữ liệu nhân viên và ghi chú dưới dạng JSON.
+              All employee data and notes as JSON.
             </span>
           </div>
           <a
@@ -74,7 +74,7 @@ export function DataControls() {
             download
             className="shrink-0 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
           >
-            Xuất JSON
+            Export JSON
           </a>
         </div>
 
@@ -82,10 +82,10 @@ export function DataControls() {
         <div className="flex items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium text-red-600">
-              Xoá dữ liệu nhân viên
+              Delete employee data
             </span>
             <span className="text-xs text-zinc-500">
-              Xoá mọi nhân viên, note, goal và tag. Tài khoản và cấu hình cảm nhận được giữ lại.
+              Delete every employee, note, goal and tag. Your account and sentiment config are kept.
             </span>
           </div>
           <button
@@ -94,7 +94,7 @@ export function DataControls() {
             onClick={() => setConfirm("all")}
             className="shrink-0 rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
           >
-            Xoá dữ liệu
+            Delete data
           </button>
         </div>
 
@@ -102,10 +102,10 @@ export function DataControls() {
         <div className="flex items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium text-red-600">
-              Xoá tài khoản
+              Delete account
             </span>
             <span className="text-xs text-zinc-500">
-              Xoá tài khoản và mọi dữ liệu vĩnh viễn. Không thể hoàn tác.
+              Permanently delete your account and all data. This cannot be undone.
             </span>
           </div>
           <button
@@ -114,7 +114,7 @@ export function DataControls() {
             onClick={() => setConfirm("account")}
             className="shrink-0 rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
           >
-            Xoá tài khoản
+            Delete account
           </button>
         </div>
       </div>
@@ -122,10 +122,10 @@ export function DataControls() {
       {/* Confirm dialogs — rendered conditionally, use native <dialog> + type-to-confirm */}
       {confirm === "all" && (
         <ConfirmDestructiveDialog
-          title="Xoá toàn bộ dữ liệu nhân viên"
-          message="Mọi nhân viên, note, goal và tag sẽ bị xoá. Tài khoản và cấu hình cảm nhận được giữ lại. Không thể hoàn tác."
-          confirmWord="XOA HET"
-          confirmLabel="Xoá hết"
+          title="Delete all employee data"
+          message="Every employee, note, goal and tag will be deleted. Your account and sentiment config are kept. This cannot be undone."
+          confirmWord="DELETE ALL"
+          confirmLabel="Delete all"
           pending={pending}
           onCancel={() => setConfirm(null)}
           onConfirm={doDeleteAll}
@@ -133,10 +133,10 @@ export function DataControls() {
       )}
       {confirm === "account" && (
         <ConfirmDestructiveDialog
-          title="Xoá tài khoản"
-          message="Toàn bộ tài khoản và dữ liệu sẽ bị xoá vĩnh viễn. Bạn sẽ bị đăng xuất. Không thể hoàn tác."
-          confirmWord="XOA TAI KHOAN"
-          confirmLabel="Xoá tài khoản"
+          title="Delete account"
+          message="Your entire account and all data will be permanently deleted. You will be signed out. This cannot be undone."
+          confirmWord="DELETE ACCOUNT"
+          confirmLabel="Delete account"
           pending={pending}
           onCancel={() => setConfirm(null)}
           onConfirm={doDeleteAccount}

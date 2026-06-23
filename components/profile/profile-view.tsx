@@ -55,7 +55,7 @@ export function ProfileView({ employeeId }: { employeeId: string }) {
   if (error) {
     return (
       <p className="p-4 text-sm text-red-600">
-        Không tải được hồ sơ. Thử tải lại trang.
+        Could not load the profile. Try reloading the page.
       </p>
     );
   }
@@ -65,7 +65,7 @@ export function ProfileView({ employeeId }: { employeeId: string }) {
   if (!data.employee) {
     return (
       <p className="p-8 text-center text-sm text-zinc-500">
-        Không tìm thấy nhân viên.
+        Employee not found.
       </p>
     );
   }
@@ -81,7 +81,7 @@ export function ProfileView({ employeeId }: { employeeId: string }) {
       <QuickAdd
         employeeId={employee.id}
         sentiments={activeSentiments}
-        triggerLabel={`Ghi cho ${firstName}`}
+        triggerLabel={`Log for ${firstName}`}
       />
       <ClosenessSlider
         employeeId={employee.id}
@@ -96,7 +96,7 @@ export function ProfileView({ employeeId }: { employeeId: string }) {
       <ProfileHeader employee={card} allTags={allTags} desktopAction={desktopAction} />
 
       {/* Mobile sticky quick-add — hidden at lg (desktop uses the header button).
-          Keep accessible name "+ Ghi hôm nay" for e2e tests that target this label. */}
+          Keep accessible name "+ Log today" for e2e tests that target this label. */}
       <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white px-4 py-3 lg:hidden">
         <QuickAdd employeeId={employee.id} sentiments={activeSentiments} big />
       </div>

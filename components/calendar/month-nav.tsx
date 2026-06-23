@@ -24,12 +24,12 @@ export function MonthNav({
           onClick={onToday}
           className="rounded-lg border border-zinc-200 px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
         >
-          Hôm nay
+          Today
         </button>
         <button
           type="button"
           onClick={onPrev}
-          aria-label="Tháng trước"
+          aria-label="Previous month"
           className="rounded-lg border border-zinc-200 p-1.5 text-zinc-600 hover:bg-zinc-50"
         >
           <Chevron dir="left" />
@@ -37,7 +37,7 @@ export function MonthNav({
         <button
           type="button"
           onClick={onNext}
-          aria-label="Tháng sau"
+          aria-label="Next month"
           className="rounded-lg border border-zinc-200 p-1.5 text-zinc-600 hover:bg-zinc-50"
         >
           <Chevron dir="right" />

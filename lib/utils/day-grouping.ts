@@ -14,9 +14,9 @@ function daysAgo(date: string, today: string): number {
 // Bucket key + label: today / yesterday / this-week / explicit older date.
 function bucket(date: string, today: string): { key: string; label: string } {
   const diff = daysAgo(date, today);
-  if (diff <= 0) return { key: "today", label: "Hôm nay" }; // future folds into today
-  if (diff === 1) return { key: "yesterday", label: "Hôm qua" };
-  if (diff < 7) return { key: "this-week", label: "Tuần này" };
+  if (diff <= 0) return { key: "today", label: "Today" }; // future folds into today
+  if (diff === 1) return { key: "yesterday", label: "Yesterday" };
+  if (diff < 7) return { key: "this-week", label: "This week" };
   return { key: date, label: date };
 }
 

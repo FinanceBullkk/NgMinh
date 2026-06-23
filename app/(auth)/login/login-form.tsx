@@ -6,7 +6,7 @@ import { startGoogleSignIn } from "@/lib/auth/oauth-client";
 
 // Production shows Google only. The email/password form renders only when `showPasswordForm`
 // (local dev + the e2e harness) — see login/page.tsx. The Google button label intentionally
-// avoids the substring "Đăng nhập" so the e2e's email submit button stays unambiguous.
+// avoids the exact "Sign in" text so the e2e's email submit button stays unambiguous.
 export function LoginForm({
   showPasswordForm,
   error,
@@ -20,7 +20,7 @@ export function LoginForm({
     <div className="flex flex-col gap-4">
       {error && (
         <p role="alert" className="text-sm text-red-600">
-          Đăng nhập không thành công. Vui lòng thử lại.
+          Sign-in failed. Please try again.
         </p>
       )}
 
@@ -29,14 +29,14 @@ export function LoginForm({
         onClick={() => startGoogleSignIn()}
         className="flex w-full items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
       >
-        Tiếp tục với Google
+        Continue with Google
       </button>
 
       {showPasswordForm && (
         <>
           <div className="flex items-center gap-3 text-xs text-zinc-400">
             <span className="h-px flex-1 bg-zinc-200" />
-            hoặc
+            or
             <span className="h-px flex-1 bg-zinc-200" />
           </div>
 
@@ -52,7 +52,7 @@ export function LoginForm({
               />
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              Mật khẩu
+              Password
               <input
                 name="password"
                 type="password"
@@ -73,7 +73,7 @@ export function LoginForm({
               disabled={pending}
               className="rounded-md bg-[#3f8f6b] px-4 py-2 font-medium text-white disabled:opacity-60"
             >
-              {pending ? "Đang vào…" : "Đăng nhập"}
+              {pending ? "Signing in…" : "Sign in"}
             </button>
           </form>
         </>

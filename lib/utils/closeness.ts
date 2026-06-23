@@ -1,5 +1,5 @@
 // Closeness = how well the manager knows a report (1–5, spec §4).
-const LABELS = ["—", "Xa", "Hơi xa", "Vừa", "Gần", "Rất gần"];
+const LABELS = ["—", "Distant", "Somewhat distant", "Moderate", "Close", "Very close"];
 
 export function closenessLabel(value: number | null): string {
   if (!value) return LABELS[0];

@@ -79,7 +79,7 @@ export function RosterGrid({
   const onDelete = (e: EmployeeCard) => {
     if (
       !window.confirm(
-        `Xoá "${e.name}"? Mọi note, goal và tag liên quan sẽ bị xoá theo.`,
+        `Delete "${e.name}"? All related notes, goals and tags will be deleted too.`,
       )
     )
       return;
@@ -104,16 +104,16 @@ export function RosterGrid({
           <div className="flex items-baseline gap-2">
             <h1 className="text-2xl font-semibold tracking-tight">Roster</h1>
             <span className="text-sm text-zinc-400">
-              {employees.length} nhân viên
+              {employees.length} employees
             </span>
           </div>
 
-          {/* "+ Nhân viên" button — shown in the left group on mobile only */}
+          {/* "+ Employee" button — shown in the left group on mobile only */}
           <button
             onClick={() => setDialog({ mode: "new", employee: null })}
             className="rounded-md bg-[#3f8f6b] px-3 py-2 text-sm font-medium text-white lg:hidden"
           >
-            + Nhân viên
+            + Employee
           </button>
         </div>
 
@@ -124,12 +124,12 @@ export function RosterGrid({
             <RosterSearch value={query} onChange={setQuery} />
           </div>
 
-          {/* "+ Nhân viên" button — desktop only */}
+          {/* "+ Employee" button — desktop only */}
           <button
             onClick={() => setDialog({ mode: "new", employee: null })}
             className="hidden shrink-0 rounded-md bg-[#3f8f6b] px-3 py-2 text-sm font-medium text-white lg:flex lg:items-center lg:gap-1"
           >
-            + Nhân viên
+            + Employee
           </button>
         </div>
       </div>

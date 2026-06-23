@@ -1,4 +1,5 @@
 import type { Database } from "./database";
+import type { SentimentTrend } from "@/lib/utils/sentiment-trend";
 
 // Convenience aliases over the generated Database type. Import these, not the raw paths.
 export type Tables<T extends keyof Database["public"]["Tables"]> =
@@ -26,6 +27,9 @@ export type EmployeeCard = Employee & {
   tags: Tag[];
   sentimentColors: string[];
   nudges: { stale1on1: boolean; cooling: boolean };
+  // Plain-language read of recent sentiment level (drives the trend chip). 'cool' aligns with
+  // nudges.cooling — same window/threshold, one notion of "cooling".
+  sentimentTrend: SentimentTrend;
 };
 
 // A timeline entry with its sentiment label+color resolved (incl. archived options).

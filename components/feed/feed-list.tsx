@@ -80,7 +80,7 @@ export function FeedList({
       <div className={filterPending ? "opacity-60 transition-opacity" : "transition-opacity"}>
         {groups.length === 0 ? (
           <p className="py-12 text-center text-sm text-zinc-500">
-            {filtering ? "Không có ghi chép khớp bộ lọc." : "Chưa có ghi chép."}
+            {filtering ? "No entries match the filter." : "No entries yet"}
           </p>
         ) : (
           groups.map((g) => <FeedDayGroup key={g.key} group={g} />)
@@ -93,7 +93,7 @@ export function FeedList({
           disabled={loading}
           className="self-center rounded-md border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50"
         >
-          {loading ? "Đang tải…" : "Tải thêm cũ hơn"}
+          {loading ? "Loading…" : "Load older"}
         </button>
       )}
     </>

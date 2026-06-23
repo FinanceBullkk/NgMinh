@@ -45,26 +45,26 @@ export function EmployeeFormDialog({
     >
       <form action={formAction} className="flex flex-col gap-3 p-5">
         <h2 id="employee-form-title" className="text-lg font-semibold">
-          {mode === "edit" ? "Sửa nhân viên" : "Nhân viên mới"}
+          {mode === "edit" ? "Edit employee" : "New employee"}
         </h2>
 
         {mode === "edit" && employee && (
           <input type="hidden" name="id" defaultValue={employee.id} />
         )}
 
-        <Field label="Tên *">
+        <Field label="Name *">
           <input name="name" required defaultValue={employee?.name ?? ""} className={inputCls} />
         </Field>
-        <Field label="Vai trò">
+        <Field label="Role">
           <input name="role_title" defaultValue={employee?.role_title ?? ""} className={inputCls} />
         </Field>
         <Field label="Team">
           <input name="team" defaultValue={employee?.team ?? ""} className={inputCls} />
         </Field>
-        <Field label="Ngày bắt đầu">
+        <Field label="Start date">
           <input type="date" name="start_date" defaultValue={employee?.start_date ?? ""} className={inputCls} />
         </Field>
-        <Field label="Mức gần gũi (1–5)">
+        <Field label="Closeness (1–5)">
           <input
             type="number"
             name="closeness"
@@ -83,14 +83,14 @@ export function EmployeeFormDialog({
             onClick={() => ref.current?.close()}
             className="px-3 py-2 text-sm text-zinc-500"
           >
-            Huỷ
+            Cancel
           </button>
           <button
             type="submit"
             disabled={pending}
             className="rounded-md bg-[#3f8f6b] px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
           >
-            {pending ? "Đang lưu…" : "Lưu"}
+            {pending ? "Saving…" : "Save"}
           </button>
         </div>
       </form>

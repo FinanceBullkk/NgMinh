@@ -15,13 +15,13 @@ export async function createEmployee(
   formData: FormData,
 ): Promise<ActionState> {
   const name = text(formData.get("name"));
-  if (!name) return { error: "Tên bắt buộc." };
+  if (!name) return { error: "Name is required." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   // user_id auto-set by DEFAULT auth.uid() + RLS WITH CHECK — never trust the client for it.
   const { error } = await supabase.from("employees").insert({
@@ -42,15 +42,15 @@ export async function updateEmployee(
   formData: FormData,
 ): Promise<ActionState> {
   const id = text(formData.get("id"));
-  if (!id) return { error: "Thiếu id." };
+  if (!id) return { error: "Missing id." };
   const name = text(formData.get("name"));
-  if (!name) return { error: "Tên bắt buộc." };
+  if (!name) return { error: "Name is required." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("employees")
@@ -69,12 +69,12 @@ export async function updateEmployee(
 }
 
 export async function deleteEmployee(id: string): Promise<ActionState> {
-  if (!id) return { error: "Thiếu id." };
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   // FK CASCADE removes the employee's entries, goals and tag links.
   const { error } = await supabase.from("employees").delete().eq("id", id);
@@ -98,7 +98,7 @@ export async function updateCurrentTake(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("employees")
@@ -119,7 +119,7 @@ export async function updateCloseness(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("employees")

@@ -11,7 +11,7 @@ export function RosterView() {
   if (error) {
     return (
       <p className="p-4 text-sm text-red-600">
-        Không tải được Roster. Thử tải lại trang.
+        Could not load Roster. Try reloading the page.
       </p>
     );
   }

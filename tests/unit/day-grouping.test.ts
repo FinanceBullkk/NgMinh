@@ -16,9 +16,9 @@ describe("groupByDay", () => {
     ]);
 
     expect(groups.map(({ key, label }) => ({ key, label }))).toEqual([
-      { key: "today", label: "Hôm nay" },
-      { key: "yesterday", label: "Hôm qua" },
-      { key: "this-week", label: "Tuần này" },
+      { key: "today", label: "Today" },
+      { key: "yesterday", label: "Yesterday" },
+      { key: "this-week", label: "This week" },
       { key: "2026-06-14", label: "2026-06-14" },
     ]);
   });
@@ -31,7 +31,7 @@ describe("groupByDay", () => {
       ],
       "2026-06-22",
     );
-    expect(groups.map((g) => g.label)).toEqual(["Hôm nay", "Hôm qua"]);
+    expect(groups.map((g) => g.label)).toEqual(["Today", "Yesterday"]);
   });
 
   it("keeps input order inside each day bucket", () => {

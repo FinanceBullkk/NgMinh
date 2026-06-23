@@ -31,11 +31,11 @@ export async function createSentiment(
   weight = 0,
 ): Promise<{ option: SentimentOption } | { error: string }> {
   const l = label.trim();
-  if (!l) return { error: "Tên trống." };
-  if (!isHexColor(color)) return { error: "Màu không hợp lệ." };
+  if (!l) return { error: "Name is empty." };
+  if (!isHexColor(color)) return { error: "Invalid color." };
 
   const { supabase, user } = await requireUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { data: last } = await supabase
     .from("sentiment_options")
@@ -63,11 +63,11 @@ export async function updateSentiment(
   weight = 0,
 ): Promise<{ error?: string }> {
   const l = label.trim();
-  if (!l) return { error: "Tên trống." };
-  if (!isHexColor(color)) return { error: "Màu không hợp lệ." };
+  if (!l) return { error: "Name is empty." };
+  if (!isHexColor(color)) return { error: "Invalid color." };
 
   const { supabase, user } = await requireUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("sentiment_options")
@@ -81,7 +81,7 @@ export async function updateSentiment(
 
 export async function reorderSentiment(ids: string[]): Promise<{ error?: string }> {
   const { supabase, user } = await requireUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
   if (ids.length === 0) return {};
 
   // Update ONLY order_index per row — never a read-then-rewrite of full rows, which would clobber
@@ -100,7 +100,7 @@ export async function reorderSentiment(ids: string[]): Promise<{ error?: string 
 
 export async function archiveSentiment(id: string): Promise<{ error?: string }> {
   const { supabase, user } = await requireUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   // Guard: never archive the last active option (quick-add would have none).
   const { count } = await supabase
@@ -108,7 +108,7 @@ export async function archiveSentiment(id: string): Promise<{ error?: string }> 
     .select("*", { count: "exact", head: true })
     .eq("is_archived", false);
   if ((count ?? 0) <= 1) {
-    return { error: "Phải còn ít nhất 1 cảm nhận đang dùng." };
+    return { error: "At least 1 sentiment must remain in use." };
   }
 
   const { error } = await supabase
@@ -123,7 +123,7 @@ export async function archiveSentiment(id: string): Promise<{ error?: string }> 
 
 export async function unarchiveSentiment(id: string): Promise<{ error?: string }> {
   const { supabase, user } = await requireUser();
-  if (!user) return { error: "Chưa đăng nhập." };
+  if (!user) return { error: "Not signed in." };
 
   const { error } = await supabase
     .from("sentiment_options")
