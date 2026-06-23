@@ -37,6 +37,7 @@ export function FeedFilters({
   onToggleType,
   onClearTypes,
   filtering,
+  scopeNote = true,
 }: {
   employees: { id: string; name: string }[];
   tags: Tag[];
@@ -49,6 +50,9 @@ export function FeedFilters({
   onToggleType: (t: EntryType) => void;
   onClearTypes: () => void;
   filtering: boolean;
+  // The "filters all data, not just the page" note is only accurate for the paginated List
+  // view; the Calendar loads a whole bounded month, so the shell turns it off there.
+  scopeNote?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -110,7 +114,7 @@ export function FeedFilters({
         </Section>
       )}
 
-      {filtering && (
+      {filtering && scopeNote && (
         <div className="flex items-center gap-1.5 text-[11.5px] text-[#3f8f6b]">
           <svg
             width="13"

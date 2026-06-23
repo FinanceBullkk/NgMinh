@@ -1,6 +1,11 @@
-// Month-grid math for the Calendar view (by-time axis, rendered as a grid). Pure & UTC-based
-// so it's timezone-safe and unit-testable. entry_date is a plain 'YYYY-MM-DD' string, and a
-// "month" here is a 'YYYY-MM' string — both compared lexically, no Date objects leak out.
+// Month-grid math for the Calendar view (by-time axis, rendered as a grid). Pure & unit-testable.
+//
+// TIMEZONE NOTE (don't "fix" this to use Asia/Saigon): this module never reads a *timestamp* in a
+// timezone — it does calendar-date-string arithmetic. Dates are anchored at UTC midnight and
+// stepped by whole days, then formatted with toISOString().slice(0,10), so a cell is the literal
+// calendar string e.g. "2026-06-23". It is compared against entry_date and todayInSaigon(), which
+// are ALSO 'YYYY-MM-DD' calendar strings — string-to-string, no drift. Same drift-free technique
+// day-grouping.ts uses. A "month" is a 'YYYY-MM' string; no Date objects leak out.
 
 const MS_DAY = 86_400_000;
 const iso = (ms: number) => new Date(ms).toISOString().slice(0, 10); // YYYY-MM-DD (UTC)

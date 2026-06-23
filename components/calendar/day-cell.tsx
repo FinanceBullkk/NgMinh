@@ -41,9 +41,9 @@ export function DayCell({
       </span>
       {ribbon.length > 0 && (
         <span className="flex h-1.5 w-full max-w-[34px] overflow-hidden rounded-full" aria-hidden>
-          {ribbon.map((seg, i) => (
+          {ribbon.map((seg) => (
             <span
-              key={i}
+              key={seg.color}
               style={{ width: `${seg.ratio * 100}%`, backgroundColor: seg.color }}
             />
           ))}

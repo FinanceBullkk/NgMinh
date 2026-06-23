@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useEntry, cache } from "@/lib/cache";
 import { todayInSaigon } from "@/lib/utils/today";
 import { buildMonthMatrix, monthOf, shiftMonth } from "@/lib/utils/month-grid";
@@ -44,7 +44,13 @@ export function CalendarView({
   const matrix = useMemo(() => buildMonthMatrix(month, today), [month, today]);
   const selectedEntries = byDay.get(selected) ?? NO_ENTRIES;
 
-  const goMonth = (delta: number) => setMonth((m) => shiftMonth(m, delta));
+  const goMonth = (delta: number) => {
+    const next = shiftMonth(month, delta);
+    setMonth(next);
+    // Keep the selection inside the visible month so the pane/sheet never reflects an
+    // off-screen day (today if we land on the current month, else the 1st).
+    setSelected(next === monthOf(today) ? today : `${next}-01`);
+  };
   const goToday = () => {
     setMonth(monthOf(today));
     setSelected(today);
@@ -66,6 +72,23 @@ export function CalendarView({
     if (Math.abs(dx) > 60) goMonth(dx < 0 ? 1 : -1); // swipe left → next month
   };
 
+  // Mobile sheet: lock body scroll + close on Escape. Skipped on desktop, where the sheet is
+  // CSS-hidden (lg:hidden) and the side pane is always visible.
+  useEffect(() => {
+    if (!sheetOpen) return;
+    if (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSheetOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [sheetOpen]);
+
   if (error) {
     return <p className="py-12 text-center text-sm text-red-600">Không tải được lịch. Thử tải lại trang.</p>;
   }
@@ -81,6 +104,11 @@ export function CalendarView({
             <MonthGrid matrix={matrix} byDay={byDay} selected={selected} onSelect={pick} />
           )}
         </div>
+        {data && filter.filtering && byDay.size === 0 && (
+          <p className="pt-4 text-center text-sm text-zinc-500">
+            Không có ghi chép nào khớp bộ lọc trong tháng này.
+          </p>
+        )}
       </div>
 
       {/* Desktop: permanent side pane that always shows the selected day. */}
@@ -95,6 +123,7 @@ export function CalendarView({
           <div
             role="dialog"
             aria-modal="true"
+            aria-label="Ghi chép trong ngày"
             className="fixed inset-x-0 bottom-0 z-50 max-h-[80dvh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl"
           >
             <div className="mx-auto mb-2 h-1.5 w-9 rounded-full bg-zinc-300" aria-hidden />

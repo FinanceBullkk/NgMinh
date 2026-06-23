@@ -45,7 +45,12 @@ export function FeedShell({ bootstrap }: { bootstrap: FeedBootstrap }) {
     [person, selectedTypes, tagEmployeeIds],
   );
 
-  const filter: FeedFilterState = { person, selectedTypes, tagEmployeeIds, filtering, filterKey };
+  // Memoized so its reference is stable across renders (e.g. toggling view) — both FeedList and
+  // CalendarView key expensive memos off this object.
+  const filter: FeedFilterState = useMemo(
+    () => ({ person, selectedTypes, tagEmployeeIds, filtering, filterKey }),
+    [person, selectedTypes, tagEmployeeIds, filtering, filterKey],
+  );
 
   return (
     <div
@@ -73,6 +78,7 @@ export function FeedShell({ bootstrap }: { bootstrap: FeedBootstrap }) {
         onToggleType={(t) => toggle(selectedTypes, t, setSelectedTypes)}
         onClearTypes={() => setSelectedTypes(new Set())}
         filtering={filtering}
+        scopeNote={view === "list"}
       />
 
       {view === "list" ? (
