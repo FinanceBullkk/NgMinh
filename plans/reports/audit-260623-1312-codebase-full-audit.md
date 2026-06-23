@@ -71,7 +71,12 @@ Fixed #1–#13 (A+B+C). Adversarial verify-workflow on the fixes (11 verifiers) 
 
 Gates green: `lint` · `tsc --noEmit` · `build` · `vitest` (80 unit, +5 new).
 
+## Open-items round (2026-06-23) — all 3 resolved
+1. **#4 residual** — `groupByDay(items, today?)` now takes a render-fresh `today`; `feed-list` passes it into the memo (`[source, today]`) so day labels roll over midnight. De-duped the private `todayInSaigon` (now imports the canonical `lib/utils/today`). +1 deterministic unit test.
+2. **#6 follow-up** — `lib/data/sentiment.ts` (both functions, 0 callers) **deleted** — confirmed no imports; live fetchers already carry the tiebreaker.
+3. **#13 depth** — calendar mobile sheet now moves focus into the panel on open + restores to the trigger on close (honest `aria-modal`). Full Tab-trap / native-`<dialog>` conversion **intentionally skipped**: `.sheet` CSS turns into a centered desktop modal, so a native-dialog conversion would wrongly pop a modal on desktop (side-pane only) — too risky for a single-user touch app (YAGNI).
+
+Gates green: `lint` · `tsc` · `build` · `vitest` (81 unit).
+
 ## Unresolved questions
-1. **#4 residual:** Feed `groupByDay` is memoized on `[source]` and is likewise stale across midnight (out of this fix's scope). Make it midnight-tolerant too, or leave (single-user PWA, low impact)?
-2. **#6 follow-up:** the now-dead `listSentimentOptions`/`listAllSentimentOptions` in `lib/data/sentiment.ts` have 0 callers — delete them, or wire them as the canonical data-layer API? (left untouched for now)
-3. **#13 depth:** stopped at `aria-labelledby` + Escape. Full focus-trap / roving-tabindex on the mobile calendar sheet + menus — worth it, or YAGNI for a private single-user touch app?
+None — all audit findings + open items resolved.

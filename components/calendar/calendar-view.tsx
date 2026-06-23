@@ -63,6 +63,8 @@ export function CalendarView({
     setSheetOpen(true); // opens the mobile sheet; the desktop pane just reflects `selected`
   };
 
+  const sheetPanelRef = useRef<HTMLDivElement>(null);
+
   // Horizontal swipe on the grid changes month (mobile).
   const touchX = useRef<number | null>(null);
   const onTouchStart = (e: React.TouchEvent) => {
@@ -75,8 +77,10 @@ export function CalendarView({
     if (Math.abs(dx) > 60) goMonth(dx < 0 ? 1 : -1); // swipe left → next month
   };
 
-  // Mobile sheet: lock body scroll + close on Escape. Skipped on desktop, where the sheet is
-  // CSS-hidden (lg:hidden) and the side pane is always visible.
+  // Mobile sheet: lock body scroll, close on Escape, and move focus into the sheet (restoring it
+  // to the trigger on close) so aria-modal="true" is honest. Skipped on desktop, where the sheet is
+  // CSS-hidden (lg:hidden) and the side pane is always visible. (Full Tab-trap is omitted by design
+  // — a single-user touch app; focus-in + Escape + restore is the meaningful part.)
   useEffect(() => {
     if (!sheetOpen) return;
     if (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches) return;
@@ -86,9 +90,12 @@ export function CalendarView({
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const trigger = document.activeElement as HTMLElement | null; // the day cell that opened the sheet
+    sheetPanelRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      trigger?.focus(); // return focus to where the user was
     };
   }, [sheetOpen]);
 
@@ -124,10 +131,12 @@ export function CalendarView({
         <div className="lg:hidden">
           <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setSheetOpen(false)} aria-hidden />
           <div
+            ref={sheetPanelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Ghi chép trong ngày"
-            className="fixed inset-x-0 bottom-0 z-50 max-h-[80dvh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl"
+            tabIndex={-1}
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[80dvh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-2xl outline-none"
           >
             <div className="mx-auto mb-2 h-1.5 w-9 rounded-full bg-zinc-300" aria-hidden />
             <DayDetail date={selected} entries={selectedEntries} employees={employees} />

@@ -1,11 +1,9 @@
 // Group entries by day with relative labels, in Asia/Saigon (spec §7.3).
 // entry_date is a plain 'YYYY-MM-DD' string (no time), so comparisons are date-only.
 
-export type DayGroup<T> = { key: string; label: string; items: T[] };
+import { todayInSaigon } from "@/lib/utils/today";
 
-function todayInSaigon(): string {
-  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Saigon" });
-}
+export type DayGroup<T> = { key: string; label: string; items: T[] };
 
 function daysAgo(date: string, today: string): number {
   const a = Date.parse(`${today}T00:00:00Z`);
@@ -22,10 +20,12 @@ function bucket(date: string, today: string): { key: string; label: string } {
   return { key: date, label: date };
 }
 
+// `today` is a parameter (default = now) so the caller can pass a render-fresh value: a memoized
+// caller that froze `today` at mount would otherwise show stale "Hôm nay"/"Hôm qua" past midnight.
 export function groupByDay<T extends { entry_date: string }>(
   items: T[],
+  today: string = todayInSaigon(),
 ): DayGroup<T>[] {
-  const today = todayInSaigon();
   const groups: DayGroup<T>[] = [];
   const index = new Map<string, DayGroup<T>>();
   for (const it of items) {

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { FeedEntry } from "@/lib/types/models";
 import { groupByDay } from "@/lib/utils/day-grouping";
+import { todayInSaigon } from "@/lib/utils/today";
 import { mergeFeedPages } from "@/lib/utils/feed-merge";
 import { matchesEntryFilter, type FeedFilterState } from "@/lib/utils/entry-filter";
 import { fetchFeedPage, fetchFeedFiltered } from "@/lib/data/feed-client";
@@ -62,7 +63,10 @@ export function FeedList({
   // local view bridges the gap until the matching fetch resolves.
   const globalMatch = filtering && fetched && fetched.key === filterKey ? fetched.items : null;
   const source = filtering ? (globalMatch ?? localFiltered) : items;
-  const groups = useMemo(() => groupByDay(source), [source]);
+  // Pass a render-fresh `today` (string primitive) so the memo recomputes when the day rolls over
+  // midnight — otherwise the relative day labels freeze at mount.
+  const today = todayInSaigon();
+  const groups = useMemo(() => groupByDay(source, today), [source, today]);
 
   const loadMore = () =>
     start(async () => {
