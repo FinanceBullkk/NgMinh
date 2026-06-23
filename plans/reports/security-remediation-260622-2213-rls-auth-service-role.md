@@ -23,7 +23,7 @@ migrations (009–014) + config + code, then the exploit re-run to prove it is d
 | 013 | length CHECK caps on all text columns | M4 |
 | 014 | append-only `security_events` + `log_security_event()` SECURITY DEFINER | M3 |
 | config.toml | signup OFF (global+email); min pw 12 + composition; TOTP enrol/verify on | H1, H5 |
-| `lib/auth/reauth.ts` + `actions/data.ts` | password step-up before delete-all/delete-account | H4 |
+| `lib/auth/recent-auth.ts` + `actions/data.ts` | recent-sign-in step-up before delete-all/delete-account (reworked from password — see Addendum) | H4 |
 | `lib/security/audit.ts` + login/data actions | audit events (no token/PII) | M3 |
 | `lib/security/headers.ts` + middleware + `next.config.ts` | CSP + HSTS + frame/nosniff/referrer/permissions; Secure cookies (HTTPS) | M1 |
 | `lib/data/feed-client.ts` | filtered-feed cap (500) | M4 |
@@ -51,7 +51,7 @@ migrations (009–014) + config + code, then the exploit re-run to prove it is d
 - After: UPDATE → **403 (42501)**, content unchanged; client `created_at` → **403 (42501)**;
   DELETE still allowed. Tests `entries-immutable` (3 cases).
 
-### H4 Step-up before destructive / M2 service-role → FIXED
+### H4 Step-up before destructive / M2 service-role → FIXED  _(step-up reworked password→recency on 2026-06-23 — see Addendum; `lib/auth/reauth.ts` superseded by `lib/auth/recent-auth.ts`)_
 - Before: `deleteAccount` only checked `getUser()` then service-role `admin.deleteUser`.
 - Fix: both destructive Server Actions re-verify the password server-side (throwaway client, no
   cookie side-effect); account deletion via scoped `delete_own_account()` RPC; **service-role key
@@ -99,7 +99,7 @@ migrations (009–014) + config + code, then the exploit re-run to prove it is d
 - `supabase db lint --local`: **No schema errors**.
 - Migrations 009–014 applied via `migration up` on the **populated** local DB (6 employees / 12
   entries / 2 users preserved; backup taken first). No `db reset`.
-- `npm test`: **75 green** — 46 unit + 28 integration (real local Supabase) + 1 e2e (prod build).
+- `npm test`: **103 green** — 75 unit + 27 integration (real local Supabase) + 1 e2e (prod build).
 - `npx tsc --noEmit`: clean. `npm run lint`: clean. `npm run build`: success.
 - Secret scan: client bundle has **no** service-role/secret (publishable key expected); git history
   has no committed service-role JWT (only the `sb_secret_…` doc placeholder); no hardcoded JWTs.
@@ -111,19 +111,36 @@ migrations (009–014) + config + code, then the exploit re-run to prove it is d
 Note: the local Supabase stack was repeatedly killed by host memory pressure during this session
 (environmental, not code) — each suite was confirmed green once the stack was stable.
 
+## Addendum — Google OAuth migration (2026-06-23)
+Switched production login from email/password to **Google OAuth** (user request; closes Free-plan gaps).
+- Login initiated **client-side** (`lib/auth/oauth-client.ts`) → top-level navigation, so the cross-origin
+  OAuth redirect is NOT blocked by CSP `form-action 'self'`. (A server-action form WAS blocked — caught +
+  fixed via prod-build console; verified the button now navigates to `…/auth/v1/authorize?provider=google
+  &redirect_to=…/auth/callback&code_challenge=…` (PKCE).) PKCE completes in `app/auth/callback/route.ts`.
+- Email/password kept ONLY for dev + e2e (`login/page.tsx` gates on `NODE_ENV`/`E2E_BUILD`).
+- **Step-up reworked** (H4): password re-verify → **recency** (`last_sign_in_at` < 5 min, provider-agnostic;
+  updates only on interactive sign-in, not refresh) → stale ⇒ bounce to Google `prompt=login`. Unit-tested
+  (`tests/unit/recent-auth.test.ts`).
+- **Closes residuals on Free plan:** no app password ⇒ HIBP moot; Google's own 2FA ⇒ MFA — provided the
+  manager's Google account has 2-Step Verification ON.
+- Verified: 103 tests green (75 unit + 27 integration + 1 e2e), build/tsc/lint clean, OAuth authorize URL
+  correct, no CSP violations. Google provider config (Google Cloud + Supabase) is owner-pending — see
+  `docs/deployment-guide.md` §3.
+
 ## Residual risk / owner-only (NOT verifiable from the repo — blocks "production-ready")
-1. **Hosted Supabase dashboard** must mirror: signup OFF, password policy, **leaked-password
-   protection**, TOTP. config.toml does not reach prod. App is LIVE (`ng-minh.vercel.app`).
-2. **AAL2 enforcement + TOTP enrolment UI** not built — password step-up is the current gate.
-3. **Org + manager-account MFA**, TLS/HSTS preload, DB SSL enforcement, network restrictions.
-4. **Backups / PITR + restore drill**, service-key rotation/incident runbook.
+1. **Hosted Supabase dashboard:** enable Google provider (Client ID/Secret) + app `/auth/callback`
+   redirect URLs; keep signup OFF (Email provider stays enabled). config.toml does not reach prod.
+   App is LIVE (`ng-minh.vercel.app`). HIBP/TOTP no longer needed (Google OAuth) — see §3.
+2. **Manager's Google account must have 2-Step Verification ON** — this is now the app's MFA.
+3. **Org + Supabase-account MFA**, TLS/HSTS preload, DB SSL enforcement, network restrictions.
+4. **Backups / PITR + restore drill** (Free plan: use the in-app JSON export periodically), service-key
+   rotation/incident runbook.
 5. **CDN** preserves `private, no-store` + sets `Secure` cookies on the deployed domain.
 6. Privacy impact assessment + access/retention policy for real employee observations.
 
 ## Unresolved questions
-- Should TOTP AAL2 be a hard gate on destructive paths now (needs enrolment UI + Pro plan), or is
-  password step-up acceptable for v1?
 - Remove `SUPABASE_SERVICE_ROLE_KEY` from Vercel envs now that runtime no longer uses it?
+- Step-up window is 5 min — acceptable, or tune?
 - ~~Does the hosted `postgres` role retain DELETE on `auth.users` for `delete_own_account()`?~~
   **RESOLVED 2026-06-23:** confirmed on prod `lrejfdadkxusivskplmp` ("Hia", Singapore) —
   `has_table_privilege('postgres','auth.users','DELETE') = true`; migrations 009–014 pushed; RPC +

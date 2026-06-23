@@ -7,8 +7,8 @@ operational (manually provision the single account); the code is ready.
 ## Live deployment (2026-06-21)
 - **App:** https://ng-minh.vercel.app (Vercel, GitHub integration)
 - **Supabase:** project `lrejfdadkxusivskplmp` ("Hia", `https://lrejfdadkxusivskplmp.supabase.co`), region Southeast Asia (Singapore). NOTE: the earlier `kkhctymyfkhlnowjrmmn` (ap-northeast-1) project was removed — see `docs/migrate-to-singapore.md`.
-- **Status:** all 7 migrations pushed; verified end-to-end in prod (auth, Server Actions, RLS isolation, seed trigger, PWA). 
-- **Remaining user steps:** (1) create your real manager account (dashboard → Authentication → Users → Add user → Auto Confirm); (2) set Auth → URL Configuration Site URL/Redirect to the app URL; (3) replace placeholder icons.
+- **Status:** all 14 migrations pushed (incl. security hardening 009–014); verified end-to-end in prod (auth, Server Actions, RLS isolation, seed trigger, PWA). 
+- **Remaining user steps:** (1) provision the single manager account via Google sign-in — signup is OFF, so use the temporary-toggle flow in §3d; (2) set Auth → URL Configuration Site URL/Redirect to the app URL (§3c); (3) replace placeholder icons.
 
 ## 0. In-repo readiness (✅ already applied)
 - ✅ e2e build dir decoupled from `PORT` → gated on `E2E_BUILD=1` (`next.config.ts`); Playwright
@@ -132,21 +132,39 @@ supabase db push                                 # applies 009–014
   and `select to_regproc('public.delete_own_account')` are non-null (SQL Editor).
 
 ### 2. Verify `delete_own_account()` can delete `auth.users` on cloud
-Hosted `postgres` may have narrower rights than local. Test SAFELY:
-- Dashboard → Authentication → Add user (throwaway) → log into the app as them → Settings → Xoá tài
-  khoản (enter their password). If it 500s with a permission error on `auth.users`, run once in SQL
-  Editor: `grant delete on auth.users to postgres;` then retry. Delete the throwaway when done.
+RESOLVED 2026-06-23 on `lrejfdadkxusivskplmp`: `has_table_privilege('postgres','auth.users','DELETE')
+= true` (SQL Editor), RPC + `security_events` present. If a future project differs, run once:
+`grant delete on auth.users to postgres;`.
 
-### 3. Auth hardening (Dashboard → Authentication)
-- **Sign In / Providers → Email:** turn OFF "Allow new users to sign up". (Public signup = closed, H1.)
-- **Policies / Passwords:** Minimum length **12**; require lower+upper+digits; turn ON **Leaked
-  password protection** (HIBP). (H5)
-- **Multi-Factor (MFA):** enable **TOTP** (Pro plan) and enrol the manager account. (H5)
-- **URL Configuration:** Site URL = `https://ng-minh.vercel.app` + add to Redirect URLs.
+### 3. Auth = Google OAuth (login method) — closes the HIBP + MFA residuals
+The app logs in with **Google only** in production (email/password is dev/test-only). No app password
+to leak (HIBP moot) and **Google's own 2FA covers MFA** — so the Free-plan gaps disappear, provided
+the manager's Google account has 2FA enabled.
 
-### 4. Account + org MFA
-- Supabase account → Account Settings → Security → enable MFA for the owner.
-- Organization → require MFA for members (if any teammates).
+**a) Google Cloud Console** (https://console.cloud.google.com/apis/credentials):
+- Create **OAuth client ID** → type **Web application**.
+- **Authorized redirect URI** = the SUPABASE callback (NOT the app):
+  `https://lrejfdadkxusivskplmp.supabase.co/auth/v1/callback`
+- (Authorized JS origins optional: `https://ng-minh.vercel.app`.) Copy **Client ID + Secret**.
+
+**b) Supabase → Authentication → Providers → Google:** paste Client ID + Secret, **Enable**, save.
+
+**c) Supabase → Authentication → URL Configuration → Redirect URLs:** add the APP callbacks:
+  `https://ng-minh.vercel.app/auth/callback` (+ `http://localhost:3000/auth/callback` for dev).
+  Site URL = `https://ng-minh.vercel.app`.
+
+**d) Provision the manager (signup is OFF):** the first Google sign-in would be a signup → blocked.
+Either (i) temporarily turn ON "Allow new users to sign up" → click **Tiếp tục với Google** once to
+create the account → turn it OFF again; or (ii) Authentication → Add user with your **Gmail**
+(email_confirm) — the first Google login auto-links the identity (emails match).
+
+**e) Keep signup OFF** afterwards (Providers → Email → "Allow new users to sign up" = OFF, audit H1).
+Email provider stays ENABLED (do not disable it — that breaks email login used by tests; harmless in
+prod since the Google account has no password). Password policy 12+ remains as defense in depth.
+
+### 4. Ensure Google account + Supabase org have 2FA
+- The manager's **Google account** must have 2-Step Verification ON (this IS the app's MFA now).
+- Supabase account/org → enable MFA for the owner.
 
 ### 5. Database network + durability (Dashboard → Project Settings → Database)
 - **SSL enforcement = ON.**
@@ -160,11 +178,13 @@ Hosted `postgres` may have narrower rights than local. Test SAFELY:
 - Redeploy (push the merged branch or trigger a deploy).
 
 ### 7. Production smoke test (after deploy)
-- Login → roster renders; add an employee + entry; revise take; Feed shows it.
+- Click **Tiếp tục với Google** → Google consent → back to `/auth/callback` → roster renders. Add an
+  employee + entry; revise take; Feed shows it.
 - `curl -s -o /dev/null -w "%{http_code}" -X POST https://<ref>.supabase.co/auth/v1/signup -H "apikey: <publishable>" -H "Content-Type: application/json" -d '{"email":"x@x.test","password":"Str0ngPassw0rd123"}'` → must be **422**.
 - DevTools → Network → document response headers: `Content-Security-Policy`, `Strict-Transport-Security`,
   `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` present; Console has **no CSP violations**.
-- Settings → Xoá dữ liệu / Xoá tài khoản must require the password (step-up).
+- Settings → Xoá tài khoản: if your last sign-in was >5 min ago it shows "đăng nhập lại với Google"
+  (step-up) before deleting. After a fresh Google login it deletes.
 - Auth cookie (Application → Cookies) is `Secure` over HTTPS.
 
 Only flip to "approved for real employee data" once ALL of §1–§7 pass.

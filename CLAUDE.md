@@ -63,11 +63,16 @@ PWA via native `app/manifest.ts` + `app/icon.png` conventions (no service worker
 - **Security audit remediation ✅ (2026-06-22, migrations 009–014).** See `docs/system-architecture.md` →
   "Security model" + `plans/reports/security-remediation-260622-2213-rls-auth-service-role.md`. Public
   signup OFF; `entries` append-only at DB layer; composite same-owner sentiment FK; destructive actions
-  require **password step-up**; account deletion via `delete_own_account()` RPC; CSP + security
+  require **recent-sign-in step-up**; account deletion via `delete_own_account()` RPC; CSP + security
   headers; `security_events` audit. **NOT production-ready until hosted-config residuals are owner-verified.**
+- **Login = Google OAuth** (production). Initiated client-side (`lib/auth/oauth-client.ts`) to dodge
+  CSP `form-action 'self'`; PKCE completes in `app/auth/callback/route.ts`. Email/password renders only
+  in dev + e2e (`login/page.tsx` gates on `NODE_ENV`/`E2E_BUILD`). Destructive actions use a recency
+  step-up (`last_sign_in_at` < 5 min, `lib/auth/recent-auth.ts`) → bounce to Google `prompt=login`.
+  Google OAuth closes the Free-plan HIBP + MFA residuals (no password; Google 2FA).
 - **Service-role key is no longer used by the app runtime** (account deletion moved to the RPC). Only
   tests use it, read from `supabase status`. `lib/supabase/admin.ts` was removed.
-- Tests: 75 green (46 unit + 28 integration + 1 e2e). `npm test` (needs `supabase start` + `npx playwright install chromium`). E2E runs against a **production build** (port 3100, distDir `test-dist-e2e`). See `tests/README.md`.
+- Tests: 103 green (75 unit + 27 integration + 1 e2e). `npm test` (needs `supabase start` + `npx playwright install chromium`). E2E runs against a **production build** (port 3100, distDir `test-dist-e2e`). See `tests/README.md`.
 - **DB migrations:** use `supabase migration up` on a populated DB — `supabase db reset` WIPES all local data.
 - **Local config gotcha:** `[auth.email] enable_signup` maps to `GOTRUE_EXTERNAL_EMAIL_ENABLED` (toggles email
   *login*). Public signup is closed via the **global** `[auth] enable_signup=false` only. Applying config

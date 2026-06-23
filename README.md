@@ -68,8 +68,12 @@ supabase stop                        # shut the stack down
 
 ### Auth & accounts
 
-Single-user app — **public sign-up is disabled** (`config.toml` `enable_signup=false`). Provision
-the one manager only via Auth Admin. Password must be **12+ chars with upper/lower/digits**.
+**Production login = Google OAuth** (Google handles 2FA; no app password to leak). The email/password
+form below is rendered only in **local dev + the e2e harness** (`login/page.tsx`); set up the Google
+provider per `docs/deployment-guide.md` §3 for prod.
+
+Single-user app — **public sign-up is disabled** (`config.toml` `enable_signup=false`). For local dev,
+provision the one manager via Auth Admin (password **12+ chars, upper/lower/digits**).
 
 - **Studio (easiest):** http://127.0.0.1:54323 → Authentication → Add user → tick *Auto Confirm*.
 - **Admin API** (needs the service_role key from `supabase status`; the `signup` endpoint is closed):

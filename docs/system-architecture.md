@@ -26,9 +26,14 @@ worker in MVP. All sensitive data scoped per user via Row-Level Security.
   INSERT is column-scoped so `id` / `user_id` / `created_at` fall back to server-controlled defaults.
 - **Cross-owner integrity:** a composite FK `entries(sentiment_id, user_id) → sentiment_options(id, user_id)`
   (plus migration-008 triggers for employee/tag) guarantees every reference is same-owner.
-- **Destructive actions** (delete-all, delete-account) require **server-side password step-up**; a
-  valid session alone is insufficient. Account deletion runs through the scoped
-  `delete_own_account()` SECURITY DEFINER RPC — **no service-role key in the app runtime**.
+- **Login = Google OAuth** (production). Initiated client-side (`lib/auth/oauth-client.ts`) so the
+  cross-origin OAuth redirect is a top-level navigation, not a `form-action 'self'`-blocked form
+  POST; PKCE completes in the `app/auth/callback` Route Handler (`exchangeCodeForSession`).
+  Email/password is rendered only in dev + the e2e harness (`login/page.tsx`).
+- **Destructive actions** (delete-all, delete-account) require a **recent interactive sign-in**
+  (`last_sign_in_at` within 5 min — provider-agnostic step-up); stale sessions are bounced to a fresh
+  Google login (`prompt=login`). Account deletion runs through the scoped `delete_own_account()`
+  SECURITY DEFINER RPC — **no service-role key in the app runtime**.
 - **Browser headers:** CSP in `proxy`/middleware (`frame-ancestors 'none'`, `object-src 'none'`,
   `base-uri`/`form-action 'self'`, Supabase-scoped `connect-src`; `script-src 'unsafe-inline'` —
   Next-static-compatible, a nonce CSP would need app-wide dynamic rendering, deferred) + HSTS (prod)
@@ -36,8 +41,8 @@ worker in MVP. All sensitive data scoped per user via Row-Level Security.
   which breaks Server Action CSRF) + Permissions-Policy. Auth cookies `Secure` over HTTPS.
 - **Audit trail:** append-only `security_events` (export / delete_all / reauth_failure) via a
   SECURITY DEFINER logger; login failures + delete_account to server stderr. Never logs tokens/PII.
-- **Auth strength:** public signup OFF; min password 12 + composition; TOTP enrolment enabled
-  (AAL2 hard-gate + enrolment UI are follow-up).
+- **Auth strength:** Google OAuth (no app password to leak → HIBP moot; Google 2FA covers MFA);
+  public signup OFF; min password 12 + composition kept as defense for the dev/test email path.
 
 ## Core data model (see spec §4)
 
