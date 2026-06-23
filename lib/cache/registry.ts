@@ -7,6 +7,7 @@ import { fetchSettings } from "@/lib/data/settings-client";
 import { fetchProfile } from "@/lib/data/profile-client";
 import { fetchFeedBootstrap, type FeedBootstrap } from "@/lib/data/feed-client";
 import { fetchEntriesForMonth } from "@/lib/data/calendar-client";
+import { insertByFeedOrder } from "@/lib/utils/feed-merge";
 import type { FeedEntry } from "@/lib/types/models";
 
 // First-page size for the Feed: the bootstrap fetch and the FeedList "load more" page size are
@@ -30,11 +31,12 @@ export const cache = {
   calendar: family("calendar", fetchEntriesForMonth),
   feed: Object.assign(feedEntry, {
     // Drop a just-created entry into the cached Feed immediately (no refetch); the follow-up
-    // invalidate.entry() reconciles with the real row.
+    // invalidate.entry() reconciles with the real row. Inserts in (entry_date, created_at) DESC
+    // order so a back-dated entry lands in its real day group, not at the top.
     prepend(e: FeedEntry) {
       return mutate(
         feedEntry.key,
-        (cur?: FeedBootstrap) => (cur ? { ...cur, entries: [e, ...cur.entries] } : cur),
+        (cur?: FeedBootstrap) => (cur ? { ...cur, entries: insertByFeedOrder(cur.entries, e) } : cur),
         { revalidate: false },
       );
     },

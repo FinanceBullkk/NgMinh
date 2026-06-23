@@ -28,7 +28,15 @@ test.describe("manager happy path", () => {
     const observation = "Delivered the release notes before the deadline";
     const currentTake = "Reliable on scoped delivery work";
 
-    await page.goto("/login");
+    const response = await page.goto("/login");
+    // Audit M1: the production response carries the security headers + CSP, and the app still
+    // hydrates under that CSP (the rest of this test exercising the UI proves it works).
+    const headers = response!.headers();
+    expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(headers["content-security-policy"]).toContain("object-src 'none'");
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["x-frame-options"]).toBe("DENY");
+
     await page.getByLabel("Email").fill(user.email);
     await page.getByLabel("Password").fill(user.password);
     await page.getByRole("button", { name: "Sign in" }).click();

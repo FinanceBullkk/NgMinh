@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { FeedEntry } from "@/lib/types/models";
 import { groupByDay } from "@/lib/utils/day-grouping";
+import { todayInSaigon } from "@/lib/utils/today";
 import { mergeFeedPages } from "@/lib/utils/feed-merge";
 import { matchesEntryFilter, type FeedFilterState } from "@/lib/utils/entry-filter";
 import { fetchFeedPage, fetchFeedFiltered } from "@/lib/data/feed-client";
@@ -38,14 +39,18 @@ export function FeedList({
   useEffect(() => {
     if (!filtering) return;
     const key = filterKey;
+    let active = true; // suppress a late stale resolution after the filter changes (last-write-wins)
     startFilter(async () => {
       const res = await fetchFeedFiltered({
         employeeId: person || null,
         types: [...selectedTypes],
         employeeIds: tagEmployeeIds,
       });
-      setFetched({ key, items: res });
+      if (active) setFetched({ key, items: res });
     });
+    return () => {
+      active = false;
+    };
   }, [filtering, filterKey, person, selectedTypes, tagEmployeeIds]);
 
   // Optimistic view of already-loaded items while the global query is in flight.
@@ -58,7 +63,10 @@ export function FeedList({
   // local view bridges the gap until the matching fetch resolves.
   const globalMatch = filtering && fetched && fetched.key === filterKey ? fetched.items : null;
   const source = filtering ? (globalMatch ?? localFiltered) : items;
-  const groups = useMemo(() => groupByDay(source), [source]);
+  // Pass a render-fresh `today` (string primitive) so the memo recomputes when the day rolls over
+  // midnight — otherwise the relative day labels freeze at mount.
+  const today = todayInSaigon();
+  const groups = useMemo(() => groupByDay(source, today), [source, today]);
 
   const loadMore = () =>
     start(async () => {

@@ -35,18 +35,28 @@ All tables also have `id uuid PK`, `user_id uuid` (→ `auth.users` ON DELETE CA
 - `*.user_id → auth.users(id)` **ON DELETE CASCADE** (delete account → all data gone).
 - `entries.employee_id`, `goals.employee_id`, `employee_tags.employee_id → employees(id)` **CASCADE**.
 - `employee_tags.tag_id → tags(id)` **CASCADE**.
-- `entries.sentiment_id → sentiment_options(id)` **ON DELETE RESTRICT** → an in-use sentiment
-  **cannot be hard-deleted**; the app archives it instead (`is_archived = true`), preserving
-  historical sparkline colors (spec §6).
+- `entries.(sentiment_id, user_id) → sentiment_options(id, user_id)` **composite, ON DELETE
+  RESTRICT** (migration 009) → enforces **same-owner** references AND keeps the archive-not-
+  hard-delete invariant; the app archives an in-use sentiment instead (`is_archived = true`),
+  preserving historical sparkline colors (spec §6).
 
 ## RLS & grants
 
-- RLS enabled on all 6 tables; one combined policy each:
-  `FOR ALL USING ((select auth.uid()) = user_id) WITH CHECK ((select auth.uid()) = user_id)`.
-  `(select auth.uid())` is wrapped for InitPlan caching (perf).
-- **Grants:** `SELECT/INSERT/UPDATE/DELETE` to `authenticated` only. `anon` has **no**
-  privileges on these tables — single-user app, logged-out requests are denied at the table
-  level (defense in depth). RLS then restricts `authenticated` to their own rows.
+- RLS on all 7 tables, scoped **`TO authenticated`** (migration 011). Most use one
+  `FOR ALL USING/WITH CHECK ((select auth.uid()) = user_id)` policy (InitPlan-cached).
+- **`entries` is append-only** (migration 010): separate SELECT / INSERT / DELETE policies, **no
+  UPDATE** (revoked at grant + policy level); INSERT is **column-scoped** so `id`/`user_id`/
+  `created_at` cannot be client-supplied (fall back to defaults).
+- **Grants:** only the columns/commands needed; `anon` has none. TRUNCATE/REFERENCES/TRIGGER
+  revoked from all Data API roles (migration 011).
+
+## Security hardening (migrations 009–014, audit 2026-06-22)
+
+- `security_events` (migration 014): append-only audit table; RLS own-SELECT only; writes solely
+  via `log_security_event()` SECURITY DEFINER (unforgeable user_id). No tokens/PII stored.
+- `delete_own_account()` (migration 012): SECURITY DEFINER RPC deleting only `auth.uid()`'s row →
+  app runtime needs no service-role key. EXECUTE to `authenticated` only.
+- Length CHECK caps on all text columns (migration 013).
 
 ## Triggers
 

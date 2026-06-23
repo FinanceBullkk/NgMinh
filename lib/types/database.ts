@@ -146,11 +146,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "entries_sentiment_id_fkey"
-            columns: ["sentiment_id"]
+            foreignKeyName: "entries_sentiment_owner_fkey"
+            columns: ["sentiment_id", "user_id"]
             isOneToOne: false
             referencedRelation: "sentiment_options"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "user_id"]
           },
         ]
       }
@@ -194,6 +194,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      security_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          user_id?: string
+        }
+        Relationships: []
       }
       sentiment_options: {
         Row: {
@@ -254,7 +278,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_own_account: { Args: never; Returns: undefined }
+      log_security_event: {
+        Args: { p_event_type: string; p_metadata?: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       entry_type: "1:1" | "feedback" | "win" | "concern" | "note"

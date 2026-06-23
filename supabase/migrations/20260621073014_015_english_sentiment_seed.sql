@@ -1,4 +1,4 @@
--- 009 — English new-user sentiment seed
+-- 015 — English new-user sentiment seed
 -- The app UI is English, so the shipped sentiment defaults should be too. Supersedes the seed
 -- in 007 (same colors / order / polarity weights, English labels). Only affects users created
 -- AFTER this migration runs; existing users' labels are their own data (rename in Settings).

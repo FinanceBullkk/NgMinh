@@ -15,7 +15,7 @@ export type SettingsBootstrap = {
 export async function fetchSettings(): Promise<SettingsBootstrap> {
   const supabase = createClient();
   const [sentRes, tagsRes] = await Promise.all([
-    supabase.from("sentiment_options").select("*").order("order_index"),
+    supabase.from("sentiment_options").select("*").order("order_index").order("created_at"),
     supabase.from("tags").select("*").order("name"),
   ]);
   if (sentRes.error) throw sentRes.error;

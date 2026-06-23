@@ -46,7 +46,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
 
   const active = items
     .filter((s) => !s.is_archived)
-    .sort((a, b) => a.order_index - b.order_index);
+    .sort((a, b) => a.order_index - b.order_index || a.created_at.localeCompare(b.created_at));
   const archived = items.filter((s) => s.is_archived);
 
   const onCreate = (label: string, color: string, weight: number) =>

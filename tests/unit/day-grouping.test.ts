@@ -23,6 +23,17 @@ describe("groupByDay", () => {
     ]);
   });
 
+  it("labels relative to an explicit `today` (no clock dependency)", () => {
+    const groups = groupByDay(
+      [
+        { id: "t", entry_date: "2026-06-22" },
+        { id: "y", entry_date: "2026-06-21" },
+      ],
+      "2026-06-22",
+    );
+    expect(groups.map((g) => g.label)).toEqual(["Today", "Yesterday"]);
+  });
+
   it("keeps input order inside each day bucket", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-21T08:00:00Z"));

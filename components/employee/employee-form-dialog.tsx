@@ -40,10 +40,11 @@ export function EmployeeFormDialog({
     <dialog
       ref={ref}
       onClose={onClose}
+      aria-labelledby="employee-form-title"
       className="m-auto w-[min(92vw,28rem)] rounded-lg p-0 backdrop:bg-black/40"
     >
       <form action={formAction} className="flex flex-col gap-3 p-5">
-        <h2 className="text-lg font-semibold">
+        <h2 id="employee-form-title" className="text-lg font-semibold">
           {mode === "edit" ? "Edit employee" : "New employee"}
         </h2>
 

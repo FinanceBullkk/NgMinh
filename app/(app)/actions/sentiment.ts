@@ -84,23 +84,16 @@ export async function reorderSentiment(ids: string[]): Promise<{ error?: string 
   if (!user) return { error: "Not signed in." };
   if (ids.length === 0) return {};
 
-  // Atomic: one upsert (full rows) instead of N sequential UPDATEs that can half-apply.
-  const { data: rows, error: readErr } = await supabase
-    .from("sentiment_options")
-    .select("*")
-    .in("id", ids);
-  if (readErr) return { error: readErr.message };
+  // Update ONLY order_index per row — never a read-then-rewrite of full rows, which would clobber
+  // a concurrent label/color/weight edit with a stale value. order_index has no unique constraint,
+  // so per-row updates can't transiently collide; RLS scopes each write to the owner. (label/color
+  // are NOT NULL without defaults, so a partial upsert is not an option.)
+  const results = await Promise.all(
+    ids.map((id, i) => supabase.from("sentiment_options").update({ order_index: i }).eq("id", id)),
+  );
+  const failed = results.find((r) => r.error);
+  if (failed?.error) return { error: failed.error.message };
 
-  const byId = new Map((rows ?? []).map((r) => [r.id, r]));
-  const payload = ids
-    .map((id, i) => {
-      const row = byId.get(id);
-      return row ? { ...row, order_index: i } : null;
-    })
-    .filter((r): r is NonNullable<typeof r> => r !== null);
-
-  const { error } = await supabase.from("sentiment_options").upsert(payload);
-  if (error) return { error: error.message };
   revalidateAll();
   return {};
 }

@@ -35,12 +35,12 @@ npm run dev                  # http://localhost:3000
 |-----|---------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (public) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase anon/publishable key (public) |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Server-only** secret — used solely for account deletion |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Not used by the app runtime** — only tests + manual user provisioning |
 
 **Never** add the Supabase `service_role` key to a `NEXT_PUBLIC_*` var — it bypasses RLS.
-`SUPABASE_SERVICE_ROLE_KEY` (no `NEXT_PUBLIC_` prefix) is read only by server code
-(`lib/supabase/admin.ts`, guarded by `import "server-only"`) for `auth.admin.deleteUser`.
-For local dev, copy it from `supabase status` (the `SERVICE_ROLE_KEY` value).
+Account deletion now runs through the scoped `delete_own_account()` RPC (migration 012), so the
+app runtime **no longer needs** the service_role key. Only the integration/e2e tests use it, read
+at runtime from `supabase status` (the `SERVICE_ROLE_KEY` value) — never committed, never shipped.
 
 ## Local Supabase (development)
 
@@ -68,13 +68,21 @@ supabase stop                        # shut the stack down
 
 ### Auth & accounts
 
-Single-user app — **no public sign-up**. Provision the one manager account manually:
+**Production login = Google OAuth** (Google handles 2FA; no app password to leak). The email/password
+form below is rendered only in **local dev + the e2e harness** (`login/page.tsx`); set up the Google
+provider per `docs/deployment-guide.md` §3 for prod.
+
+Single-user app — **public sign-up is disabled** (`config.toml` `enable_signup=false`). For local dev,
+provision the one manager via Auth Admin (password **12+ chars, upper/lower/digits**).
+
+- **Studio (easiest):** http://127.0.0.1:54323 → Authentication → Add user → tick *Auto Confirm*.
+- **Admin API** (needs the service_role key from `supabase status`; the `signup` endpoint is closed):
 
 ```bash
-# create the account against the local stack (or use Studio → Authentication → Add user)
-curl -s -X POST http://127.0.0.1:54321/auth/v1/signup \
-  -H "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","password":"your-password"}'
+curl -s -X POST http://127.0.0.1:54321/auth/v1/admin/users \
+  -H "apikey: <SERVICE_ROLE_KEY>" -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"Str0ngPassw0rd","email_confirm":true}'
 ```
 
 Then log in at `/login`. Logged-out requests to any app route redirect to `/login`.

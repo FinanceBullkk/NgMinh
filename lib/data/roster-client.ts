@@ -41,7 +41,7 @@ export async function fetchRoster(): Promise<RosterBootstrap> {
         .order("entry_date", { ascending: true })
         .order("created_at", { ascending: true }),
       // Include all sentiment options (incl. archived) so sparkline renders historical colors.
-      supabase.from("sentiment_options").select("*").order("order_index"),
+      supabase.from("sentiment_options").select("*").order("order_index").order("created_at"),
       // hasEntryToday: any row dated today
       supabase.from("entries").select("id").eq("entry_date", today).limit(1),
     ]);
