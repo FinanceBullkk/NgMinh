@@ -105,6 +105,26 @@ function ArchiveIcon() {
   );
 }
 
+// PencilIcon: a faint edit affordance inside the name field so it reads as editable (mobile too).
+function PencilIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
+}
+
 // SentimentRow: inline edit — no separate edit mode.
 // All fields (color swatch, label, polarity) are always editable; changes persist on
 // blur/change via the parent's onUpdate callback. Archive fires onArchive.
@@ -185,14 +205,21 @@ export function SentimentRow({
         disabled={disabled}
       />
 
-      {/* Inline label input — transparent background, grows to fill space */}
-      <input
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        onBlur={handleLabelBlur}
-        aria-label="Sentiment name"
-        className="min-w-[110px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:underline"
-      />
+      {/* Inline label field — styled as an editable input (border + pencil) so it's obviously
+          tappable to rename, on mobile too. Saves on blur. */}
+      <div className="relative min-w-[110px] flex-1">
+        <input
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          onBlur={handleLabelBlur}
+          aria-label="Sentiment name"
+          placeholder="Name"
+          className="w-full rounded-md border border-zinc-200 bg-white py-1 pl-2 pr-7 text-sm text-zinc-800 outline-none transition-colors placeholder:text-zinc-400 hover:border-zinc-300 focus:border-[#3f8f6b] focus:ring-2 focus:ring-[#3f8f6b]/20"
+        />
+        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-zinc-300">
+          <PencilIcon />
+        </span>
+      </div>
 
       {/* Polarity only matters when the name doesn't already reveal direction — so the default
           Positive/Neutral/Negative rows show nothing, and only custom names get the control. */}
