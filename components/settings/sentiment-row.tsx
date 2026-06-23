@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { SentimentOption } from "@/lib/types/models";
+import { PolarityControl } from "./polarity-control";
+import { isSelfEvidentLabel, selfEvidentPolarity } from "@/lib/utils/sentiment-polarity";
 
 // 8 preset colors for the swatch popover palette (spec "Web - Settings" mock).
 const PRESET_COLORS = [
@@ -14,13 +16,6 @@ const PRESET_COLORS = [
   "#c79a2e", // amber/gold
   "#4f8a8b", // teal
 ];
-
-// Polarity (weight) segments — word labels so the meaning is obvious (was − / 0 / +).
-const POLARITY_SEGMENTS = [
-  { label: "Negative", value: -1, activeColor: "#c45b4c" },
-  { label: "Neutral", value: 0, activeColor: "#9aa0a6" },
-  { label: "Positive", value: 1, activeColor: "#3f8f6b" },
-] as const;
 
 // ColorSwatchPopover: shows a 26×26px swatch button; click opens a 2×4 grid palette.
 // Clicking a color selects it and closes. Outside-click closes.
@@ -85,50 +80,6 @@ function ColorSwatchPopover({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-// PolarityControl: 3-segment button group "− / 0 / +" in one bordered rounded pill.
-// Active segment is filled with its designated color; inactive = white bg + gray text.
-function PolarityControl({
-  weight,
-  onChange,
-  disabled,
-}: {
-  weight: number;
-  onChange: (w: number) => void;
-  disabled: boolean;
-}) {
-  return (
-    <div
-      className="flex overflow-hidden rounded-lg border border-zinc-300"
-      role="group"
-      aria-label="Polarity"
-    >
-      {POLARITY_SEGMENTS.map((seg, i) => {
-        const isActive = weight === seg.value;
-        return (
-          <button
-            key={seg.value}
-            type="button"
-            disabled={disabled}
-            onClick={() => onChange(seg.value)}
-            aria-pressed={isActive}
-            className={[
-              "px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap transition-colors disabled:opacity-50",
-              i > 0 ? "border-l border-zinc-300" : "",
-            ].join(" ")}
-            style={
-              isActive
-                ? { backgroundColor: seg.activeColor, color: "#ffffff" }
-                : { backgroundColor: "#ffffff", color: "#71717a" }
-            }
-          >
-            {seg.label}
-          </button>
-        );
-      })}
     </div>
   );
 }
@@ -215,9 +166,14 @@ export function SentimentRow({
   };
 
   const handleLabelBlur = () => {
-    if (label.trim() && label.trim() !== option.label) {
-      persist(label, color, weight);
-    }
+    const trimmed = label.trim();
+    if (!trimmed || trimmed === option.label) return;
+    // Renaming to a self-evident label (e.g. "Positive") fixes its polarity automatically and
+    // hides the control; renaming to a custom name keeps the current weight (now editable).
+    const implied = selfEvidentPolarity(trimmed);
+    const nextWeight = implied ?? weight;
+    if (nextWeight !== weight) setWeight(nextWeight);
+    persist(trimmed, color, nextWeight);
   };
 
   return (
@@ -238,12 +194,14 @@ export function SentimentRow({
         className="min-w-[110px] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400 focus:underline"
       />
 
-      {/* 3-segment polarity control */}
-      <PolarityControl
-        weight={weight}
-        onChange={handleWeightChange}
-        disabled={disabled}
-      />
+      {/* Polarity only matters when the name doesn't already reveal direction — so the default
+          Positive/Neutral/Negative rows show nothing, and only custom names get the control. */}
+      {!isSelfEvidentLabel(label) && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-zinc-400">Counts as</span>
+          <PolarityControl weight={weight} onChange={handleWeightChange} disabled={disabled} />
+        </div>
+      )}
 
       {/* Archive icon button */}
       <button

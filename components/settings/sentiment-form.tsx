@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { PolarityControl } from "./polarity-control";
+import { isSelfEvidentLabel, selfEvidentPolarity } from "@/lib/utils/sentiment-polarity";
 
 // PRESET_COLORS mirrors sentiment-row.tsx palette — default to brand green.
 const DEFAULT_COLOR = "#3f8f6b";
@@ -37,12 +39,19 @@ export function SentimentForm({
   const [expanded, setExpanded] = useState(false);
   const [label, setLabel] = useState("");
   const [color] = useState(DEFAULT_COLOR);
+  // Polarity (for custom names only). Self-evident names derive it from the name on submit.
+  const [weight, setWeight] = useState(0);
+
+  // Ask "Counts as" only once the name is typed and is NOT self-evident.
+  const needsPolarity = !!label.trim() && !isSelfEvidentLabel(label);
 
   const handleSubmit = () => {
-    if (!label.trim()) return;
-    // Default weight = 0 (neutral). User adjusts in the row after creation.
-    onSubmit(label.trim(), color, 0);
+    const trimmed = label.trim();
+    if (!trimmed) return;
+    const w = selfEvidentPolarity(trimmed) ?? weight;
+    onSubmit(trimmed, color, w);
     setLabel("");
+    setWeight(0);
     setExpanded(false);
   };
 
@@ -50,6 +59,7 @@ export function SentimentForm({
     if (e.key === "Enter") handleSubmit();
     if (e.key === "Escape") {
       setLabel("");
+      setWeight(0);
       setExpanded(false);
     }
   };
@@ -69,39 +79,50 @@ export function SentimentForm({
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2">
-      {/* Color preview dot — uses default green; no picker needed at create time */}
-      <span
-        className="h-[26px] w-[26px] shrink-0 rounded-lg border border-black/10"
-        style={{ backgroundColor: color }}
-      />
-      <input
-        autoFocus
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="New sentiment name…"
-        aria-label="New sentiment name"
-        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
-      />
-      <button
-        type="button"
-        disabled={disabled || !label.trim()}
-        onClick={handleSubmit}
-        className="shrink-0 rounded-md bg-zinc-800 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
-      >
-        Add
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setLabel("");
-          setExpanded(false);
-        }}
-        className="shrink-0 text-xs text-zinc-400 hover:text-zinc-600"
-      >
-        Cancel
-      </button>
+    <div className="flex flex-col gap-2 px-3 py-2">
+      <div className="flex items-center gap-2">
+        {/* Color preview dot — uses default green; no picker needed at create time */}
+        <span
+          className="h-[26px] w-[26px] shrink-0 rounded-lg border border-black/10"
+          style={{ backgroundColor: color }}
+        />
+        <input
+          autoFocus
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="New sentiment name…"
+          aria-label="New sentiment name"
+          className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
+        />
+        <button
+          type="button"
+          disabled={disabled || !label.trim()}
+          onClick={handleSubmit}
+          className="shrink-0 rounded-md bg-zinc-800 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+        >
+          Add
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setLabel("");
+            setWeight(0);
+            setExpanded(false);
+          }}
+          className="shrink-0 text-xs text-zinc-400 hover:text-zinc-600"
+        >
+          Cancel
+        </button>
+      </div>
+
+      {/* Custom names need a direction so the cooling/trend math can use them. */}
+      {needsPolarity && (
+        <div className="flex items-center gap-1.5 pl-[34px]">
+          <span className="text-[11px] text-zinc-400">Counts as</span>
+          <PolarityControl weight={weight} onChange={setWeight} disabled={disabled} />
+        </div>
+      )}
     </div>
   );
 }

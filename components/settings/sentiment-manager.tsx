@@ -116,7 +116,7 @@ export function SentimentManager({ initial }: { initial: SentimentOption[] }) {
     <section className="flex flex-col gap-3">
       <SectionHeader
         title="Sentiment"
-        description="Each sentiment has a label + color (the dot color on the sparkline). Mark it as Negative / Neutral / Positive so the app knows who is 'cooling' (recently all negative). The 3 defaults are already set right — you usually don't need to change them."
+        description="Each sentiment has a name + color (the dot color on the sparkline). The 3 defaults are ready to use. If you add a custom name, you'll set how it counts — positive, neutral or negative — so the app can still tell who's 'cooling'."
       />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
