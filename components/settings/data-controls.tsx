@@ -5,10 +5,10 @@ import { deleteAllData, deleteAccount } from "@/app/(app)/actions/data";
 import { startGoogleSignIn } from "@/lib/auth/oauth-client";
 import { ConfirmDestructiveDialog } from "./confirm-destructive-dialog";
 
-// DataControls: "Dữ liệu" section. Export JSON (neutral) + Delete account (destructive, red,
-// opens confirm dialog). Destructive actions are step-up gated server-side (audit H4): if the
-// session is not freshly authenticated, the action returns needsReauth and we prompt a fresh
-// Google login before retry.
+// DataControls: "Dữ liệu" section. Export JSON (neutral) + two destructive rows: delete employee
+// data only (keeps account + sentiment config) and delete the whole account. Both open a
+// type-to-confirm dialog and are step-up gated server-side (audit H4): if the session is not
+// freshly authenticated, the action returns needsReauth and we prompt a fresh Google login first.
 export function DataControls() {
   const [confirm, setConfirm] = useState<null | "all" | "account">(null);
   const [pending, start] = useTransition();
@@ -78,11 +78,31 @@ export function DataControls() {
           </a>
         </div>
 
-        {/* Row 2: Delete account (destructive) */}
+        {/* Row 2: Delete employee data only (keep account + sentiment config) */}
         <div className="flex items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium text-red-600">
-              Xoá toàn bộ dữ liệu
+              Xoá dữ liệu nhân viên
+            </span>
+            <span className="text-xs text-zinc-500">
+              Xoá mọi nhân viên, note, goal và tag. Tài khoản và cấu hình cảm nhận được giữ lại.
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => setConfirm("all")}
+            className="shrink-0 rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+          >
+            Xoá dữ liệu
+          </button>
+        </div>
+
+        {/* Row 3: Delete account (destructive — wipes everything) */}
+        <div className="flex items-center justify-between gap-4 px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm font-medium text-red-600">
+              Xoá tài khoản
             </span>
             <span className="text-xs text-zinc-500">
               Xoá tài khoản và mọi dữ liệu vĩnh viễn. Không thể hoàn tác.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, useTransition, type ReactNode } from "react";
 import { fetchQuickAddData } from "@/lib/data/quick-add-client";
 import { invalidate, cache } from "@/lib/cache";
 import { createClient } from "@/lib/supabase/client";
@@ -41,6 +41,13 @@ export function QuickAdd({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  // QuickAdd is mounted multiple times at once (sidebar + bottom-nav + profile), so the dialog
+  // title id must be per-instance — a static id would be a duplicate-id in the document.
+  const titleId = useId();
+  // In-flight guard read live (a ref, not state) so the ⌘+Enter hotkey path — whose effect
+  // closure can be stale on `pending` — still blocks a re-entrant double-submit into the
+  // append-only `entries` table. See audit #1.
+  const saving = useRef(false);
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
   const [emp, setEmp] = useState("");
@@ -97,6 +104,7 @@ export function QuickAdd({
   // `again` = "Lưu & ghi tiếp": save, keep the sheet open, clear note/sentiment so the
   // manager can log the next person without reopening.
   const save = (again: boolean) => {
+    if (saving.current || pending) return; // re-entrancy guard (double ⌘+Enter on slow net)
     const targetId = employeeId ?? emp;
     if (!targetId) return setError("Chọn nhân viên.");
     if (!content.trim()) return setError("Nhập nội dung.");
@@ -121,28 +129,35 @@ export function QuickAdd({
     };
     void cache.feed.prepend(optimistic);
 
+    saving.current = true;
     start(async () => {
-      const { error: insErr } = await createClient().from("entries").insert({
-        employee_id: targetId,
-        entry_date: entryDate,
-        type,
-        content: text,
-        sentiment_id: sentimentId,
-      });
-      if (insErr) {
-        void invalidate.entry(); // roll the optimistic entry back
-        return setError(insErr.message);
-      }
-      void invalidate.entry(); // reconcile feed/roster/profile with the real row
-      if (again) {
-        setContent("");
-        setSentimentId(null);
-        focusContent();
-      } else {
-        setContent("");
-        setSentimentId(null);
-        setType("note");
-        closeSheet();
+      try {
+        const { error: insErr } = await createClient().from("entries").insert({
+          employee_id: targetId,
+          entry_date: entryDate,
+          type,
+          content: text,
+          sentiment_id: sentimentId,
+        });
+        if (insErr) {
+          void invalidate.entry(); // roll the optimistic entry back
+          return setError(insErr.message);
+        }
+        void invalidate.entry(); // reconcile feed/roster/profile with the real row
+        if (again) {
+          setContent("");
+          setSentimentId(null);
+          focusContent();
+        } else {
+          setContent("");
+          setSentimentId(null);
+          setType("note");
+          closeSheet();
+        }
+      } finally {
+        // Always release the guard — even if the insert promise REJECTS (offline/network), so a
+        // later save is never permanently latched out.
+        saving.current = false;
       }
     });
   };
@@ -200,6 +215,7 @@ export function QuickAdd({
           if (e.target === ref.current) setOpen(false); // dismiss on backdrop tap
         }}
         className="sheet"
+        aria-labelledby={titleId}
       >
         <div className="flex max-h-[90dvh] flex-col">
           <div className="flex justify-center pt-2.5 pb-0.5 lg:hidden">
@@ -208,7 +224,7 @@ export function QuickAdd({
 
           <div className="flex flex-col gap-3.5 overflow-y-auto px-[18px] pb-[18px] pt-1.5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">Ghi hôm nay</h2>
+              <h2 id={titleId} className="text-lg font-bold">Ghi hôm nay</h2>
               <button
                 type="button"
                 onClick={() => setShowDate((v) => !v)}

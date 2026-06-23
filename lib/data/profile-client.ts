@@ -52,7 +52,7 @@ export async function fetchProfile(employeeId: string): Promise<ProfileData> {
         .order("entry_date", { ascending: false })
         .order("created_at", { ascending: false }),
       // All sentiment options (incl. archived — needed to render historical colors)
-      supabase.from("sentiment_options").select("*").order("order_index"),
+      supabase.from("sentiment_options").select("*").order("order_index").order("created_at"),
     ]);
 
   // Surface any DB error early so SWR can put it in the error slot.

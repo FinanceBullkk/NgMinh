@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { signOut } from "@/app/(app)/actions/sign-out";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
 
@@ -69,6 +69,17 @@ function NavTab({
 // Account tab: a small popover holding sign-out, so it doesn't crowd the nav row.
 function AccountTab() {
   const [open, setOpen] = useState(false);
+
+  // Keyboard-dismissible popover: close on Escape while open.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <div className="relative flex w-13 flex-col items-center">
       <button

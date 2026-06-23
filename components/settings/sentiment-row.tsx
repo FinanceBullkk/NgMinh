@@ -36,7 +36,7 @@ function ColorSwatchPopover({
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click.
+  // Close on outside click or Escape (keyboard-dismissible).
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -44,8 +44,15 @@ function ColorSwatchPopover({
         setOpen(false);
       }
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   return (

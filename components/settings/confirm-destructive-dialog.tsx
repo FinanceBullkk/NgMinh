@@ -33,10 +33,11 @@ export function ConfirmDestructiveDialog({
     <dialog
       ref={ref}
       onClose={onCancel}
+      aria-labelledby="confirm-destructive-title"
       className="m-auto w-[min(92vw,28rem)] rounded-lg p-0 backdrop:bg-black/40"
     >
       <div className="flex flex-col gap-3 p-5">
-        <h2 className="text-lg font-semibold text-red-700">{title}</h2>
+        <h2 id="confirm-destructive-title" className="text-lg font-semibold text-red-700">{title}</h2>
         <p className="text-sm text-zinc-600">{message}</p>
         <p className="text-sm">
           Gõ <code className="rounded bg-zinc-100 px-1">{confirmWord}</code> để xác nhận:

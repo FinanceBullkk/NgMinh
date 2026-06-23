@@ -38,14 +38,18 @@ export function FeedList({
   useEffect(() => {
     if (!filtering) return;
     const key = filterKey;
+    let active = true; // suppress a late stale resolution after the filter changes (last-write-wins)
     startFilter(async () => {
       const res = await fetchFeedFiltered({
         employeeId: person || null,
         types: [...selectedTypes],
         employeeIds: tagEmployeeIds,
       });
-      setFetched({ key, items: res });
+      if (active) setFetched({ key, items: res });
     });
+    return () => {
+      active = false;
+    };
   }, [filtering, filterKey, person, selectedTypes, tagEmployeeIds]);
 
   // Optimistic view of already-loaded items while the global query is in flight.

@@ -16,7 +16,8 @@ export async function fetchQuickAddData(): Promise<{
       .from("sentiment_options")
       .select("*")
       .eq("is_archived", false)
-      .order("order_index"),
+      .order("order_index")
+      .order("created_at"),
   ]);
   if (emps.error) throw emps.error;
   if (sents.error) throw sents.error;

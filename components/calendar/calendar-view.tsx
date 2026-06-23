@@ -22,7 +22,10 @@ export function CalendarView({
   filter: FeedFilterState;
   employees: { id: string; name: string }[];
 }) {
-  const today = useMemo(() => todayInSaigon(), []);
+  // Recompute each render (cheap drift-free string) so `today` is never frozen at mount —
+  // otherwise isToday/goToday/the matrix go stale once the clock rolls past midnight. As a
+  // string primitive it keeps the [month, today] memo below value-stable within a day.
+  const today = todayInSaigon();
   const [month, setMonth] = useState(() => monthOf(today));
   const [selected, setSelected] = useState(today);
   const [sheetOpen, setSheetOpen] = useState(false);

@@ -20,6 +20,17 @@ export function CurrentTakeEditor({
   const latest = useRef(initial);
   const saved = useRef(initial);
 
+  // Re-seed from a freshly revalidated server value (SWR profile refresh) when `initial` changes,
+  // but only if there's no pending local edit (latest === saved) so in-flight typing is never
+  // clobbered. In an effect (not render) since it touches refs. Mirrors use-synced-state.ts intent.
+  useEffect(() => {
+    if (latest.current === saved.current) {
+      setValue(initial);
+      latest.current = initial;
+      saved.current = initial;
+    }
+  }, [initial]);
+
   const save = async () => {
     if (latest.current === saved.current) return;
     const v = latest.current;
