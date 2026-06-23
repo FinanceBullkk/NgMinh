@@ -277,7 +277,10 @@ export function QuickAdd({
             </div>
 
             <div>
-              <div className="mb-1.5 text-xs font-semibold text-zinc-500">Cảm nhận</div>
+              <div className="text-xs font-semibold text-zinc-500">Buổi này thế nào?</div>
+              <p className="mb-1.5 text-[11px] text-zinc-400">
+                Vẽ vào đường xu hướng — để thấy quan hệ ấm lên hay nguội đi.
+              </p>
               <SentimentButtonRow sentiments={effSentiments} value={sentimentId} onChange={setSentimentId} />
             </div>
 

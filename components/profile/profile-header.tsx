@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import type { EmployeeCard, Tag } from "@/lib/types/models";
 import { SentimentSparkline } from "@/components/sparkline/sentiment-sparkline";
+import { SentimentTrendChip } from "@/components/sentiment/sentiment-trend-chip";
 import { TagEditor } from "@/components/employee/tag-editor";
 import { ClosenessSlider } from "./closeness-slider";
 import { avatarColor, avatarInitial } from "@/lib/utils/avatar-color";
@@ -22,9 +23,6 @@ export function ProfileHeader({
   const bgColor = avatarColor(employee.id);
   const initial = avatarInitial(employee.name);
 
-  // Sparkline caption derived from cooling nudge.
-  const caption = employee.nudges.cooling ? "đang nguội ↓" : null;
-
   return (
     <header className="border-b border-zinc-200 p-4 lg:px-7 lg:py-5">
       {/* ── Mobile layout (< lg): single column, same as before ── */}
@@ -36,7 +34,10 @@ export function ProfileHeader({
           <h1 className="text-2xl font-semibold tracking-tight">{employee.name}</h1>
           {subtitle && <p className="text-sm text-zinc-500">{subtitle}</p>}
         </div>
-        <SentimentSparkline colors={employee.sentimentColors} />
+        <div className="flex flex-wrap items-center gap-2">
+          <SentimentSparkline colors={employee.sentimentColors} />
+          <SentimentTrendChip trend={employee.sentimentTrend} showInvite />
+        </div>
         <ClosenessSlider employeeId={employee.id} initial={employee.closeness} variant="slider" />
         <TagEditor employee={employee} allTags={allTags} />
       </div>
@@ -66,9 +67,7 @@ export function ProfileHeader({
                 <h1 className="text-2xl font-semibold tracking-tight">{employee.name}</h1>
                 <div className="flex items-center gap-2">
                   <SentimentSparkline colors={employee.sentimentColors} />
-                  {caption && (
-                    <span className="text-xs text-zinc-400">{caption}</span>
-                  )}
+                  <SentimentTrendChip trend={employee.sentimentTrend} showInvite />
                 </div>
               </div>
               {subtitle && <p className="text-sm text-zinc-500">{subtitle}</p>}

@@ -5,6 +5,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { buildSentimentColorSeries } from "@/lib/utils/sparkline-points";
 import { computeNudges } from "@/lib/utils/nudges";
+import { computeSentimentTrend } from "@/lib/utils/sentiment-trend";
 import { todayInSaigon } from "@/lib/utils/today";
 import type { EmployeeCard, SentimentOption, Tag } from "@/lib/types/models";
 
@@ -85,18 +86,17 @@ export async function fetchRoster(): Promise<RosterBootstrap> {
 
   const cards: EmployeeCard[] = (empsRes.data ?? []).map((e) => {
     const rows = entriesByEmp.get(e.id) ?? [];
+    const weighted = rows.map((r) => ({
+      type: r.type as Parameters<typeof computeNudges>[0][number]["type"],
+      entry_date: r.entry_date,
+      weight: r.sentiment_id ? (weightById.get(r.sentiment_id) ?? null) : null,
+    }));
     return {
       ...e,
       tags: tagsByEmp.get(e.id) ?? [],
       sentimentColors: buildSentimentColorSeries(rows, sentsRes.data ?? []),
-      nudges: computeNudges(
-        rows.map((r) => ({
-          type: r.type as Parameters<typeof computeNudges>[0][number]["type"],
-          entry_date: r.entry_date,
-          weight: r.sentiment_id ? (weightById.get(r.sentiment_id) ?? null) : null,
-        })),
-        today,
-      ),
+      nudges: computeNudges(weighted, today),
+      sentimentTrend: computeSentimentTrend(weighted),
     };
   });
 

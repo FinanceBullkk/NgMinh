@@ -7,6 +7,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { buildSentimentColorSeries } from "@/lib/utils/sparkline-points";
 import { computeNudges } from "@/lib/utils/nudges";
+import { computeSentimentTrend } from "@/lib/utils/sentiment-trend";
 import type {
   Employee,
   EmployeeCard,
@@ -90,14 +91,13 @@ export async function fetchProfile(employeeId: string): Promise<ProfileData> {
   // Nudge computation (spec §8): needs weight per sentiment_id
   const weightById = new Map(allSentiments.map((s) => [s.id, s.weight]));
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Saigon" });
-  const nudges = computeNudges(
-    entries.map((e) => ({
-      type: e.type,
-      entry_date: e.entry_date,
-      weight: e.sentiment_id ? (weightById.get(e.sentiment_id) ?? null) : null,
-    })),
-    today,
-  );
+  const weighted = entries.map((e) => ({
+    type: e.type,
+    entry_date: e.entry_date,
+    weight: e.sentiment_id ? (weightById.get(e.sentiment_id) ?? null) : null,
+  }));
+  const nudges = computeNudges(weighted, today);
+  const sentimentTrend = computeSentimentTrend(weighted);
 
   const activeSentiments = allSentiments.filter((s) => !s.is_archived);
 
@@ -105,7 +105,7 @@ export async function fetchProfile(employeeId: string): Promise<ProfileData> {
   // When employee is null we still build a partial card-shape so callers compile cleanly;
   // the profile-view checks employee === null before rendering.
   const card: EmployeeCard = employee
-    ? { ...employee, tags, sentimentColors, nudges }
+    ? { ...employee, tags, sentimentColors, nudges, sentimentTrend }
     : // Fallback never rendered — profile-view bails on null employee.
       ({} as EmployeeCard);
 
