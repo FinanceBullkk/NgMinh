@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { signOut } from "@/app/(app)/actions/sign-out";
 import { QuickAdd } from "@/components/quick-add/quick-add-sheet";
+import { SignOutButton } from "./sign-out-button";
 
 // Mobile-first bottom nav: icon tabs with an active state, a center FAB that opens
 // quick-add from any screen, and sign-out tucked under an Account tab (off the nav row).
@@ -96,14 +96,9 @@ function AccountTab() {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden />
           <div className="absolute bottom-12 right-0 z-50 rounded-xl border border-zinc-200 bg-white p-1 shadow-lg">
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50"
-              >
-                Sign out
-              </button>
-            </form>
+            <SignOutButton className="whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-50">
+              Sign out
+            </SignOutButton>
           </div>
         </>
       )}

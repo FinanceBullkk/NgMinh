@@ -4,9 +4,17 @@ Project-specific guidance. The global `~/.claude/CLAUDE.md` still applies; this 
 only adds what is specific to **this** repo. Keep it short — point to docs, don't duplicate them.
 
 ## What this is
-Private, single-user **PWA**: one manager logs observations about their direct reports
-over time, to prep 1:1s and write reviews **without recency bias**. Not a CRM, not
-multi-user, no sharing. It is the manager's private notebook.
+**Multi-tenant PWA**: each manager signs in with Google and gets their own **private,
+isolated workspace** (RLS scopes every row by `user_id`) to log observations about their
+direct reports over time — to prep 1:1s and write reviews **without recency bias**. Not a
+CRM, no sharing between accounts. Each account is one manager's private notebook.
+
+> **Direction (2026-06-24):** opened from single-user → **multi-user for a small, trusted
+> group**. Enable = Supabase signup ON + Google OAuth consent screen published; data
+> isolation is already enforced by RLS on every table, and sign-out clears the client cache
+> (`sign-out-button.tsx`) for shared-browser safety. **Public/commercial launch is deferred**
+> — privacy policy, consent, PDPD/data-subject-rights, billing live in
+> `plans/260622-2235-compliant-commercialization/` and are NOT yet built.
 
 - **Spec (source of truth):** `team-tracker-spec.md`
 - **Plan:** `plans/260621-0121-team-tracker-mvp/` (9 phases, MVP)
